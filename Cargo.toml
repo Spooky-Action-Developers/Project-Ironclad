@@ -8,3 +8,4 @@ authors = ["Evan Conley <econmang@gmail.com>",
 rocket = "0.3.6"
 rocket_codegen = "0.3.6"
 rusoto_core = "0.31.0"
+rusoto_kms = "0.31.0"
