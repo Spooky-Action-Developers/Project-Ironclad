@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["Evan Conley <econmang@gmail.com>"]
 
 [dependencies]
+clippy = "0.0.62"
