@@ -93,6 +93,7 @@ dependencies = [
 [[package]]
 name = "cc"
 version = "1.0.7"
+
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -888,7 +889,6 @@ dependencies = [
  "xml-rs 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
-[[package]]
 name = "rusoto_credential"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1273,7 +1273,6 @@ dependencies = [
  "tokio-io 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
-[[package]]
 name = "tokio-service"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1294,7 +1293,6 @@ dependencies = [
  "tokio-executor 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
-[[package]]
 name = "tokio-tls"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
