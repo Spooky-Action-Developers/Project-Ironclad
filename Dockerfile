@@ -4,7 +4,7 @@
 #FROM rust:1.23.0
 
 #WORKDIR
-#COPY . /usr/src/myapp
+#COPY . /usr/src/project-ironclad
 
 #RUN cargo install
 #CMD ["project-ironclad"]
@@ -13,4 +13,4 @@
 #of project-ironclad project
 
 #$ docker build -t project-ironclad
-#$ docker run --rm --user "$(id -u)":"$(id -g)" -v "$PWD":/usr/src/myapp -w /usr/src/myapp rust:1.23.0 cargo build --release
+#$ docker run --rm --user "$(id -u)":"$(id -g)" -v "$PWD":/usr/src/project-ironclad -w /usr/src/project-ironclad rust:1.23.0 cargo build --release
