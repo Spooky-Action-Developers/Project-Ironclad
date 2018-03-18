@@ -1,4 +1,7 @@
+
 # Project-Ironclad
+|Travis-CI  | ![travis build](https://img.shields.io/travis/Spooky-Action-Developers/Project-Ironclad.svg) |
+|--|--|
 
 ## Installation
 
@@ -16,7 +19,7 @@ cargo run
 
 ## Description
 
-Project Ironclad is a command line utility to effectively create, store and retrieve secrets (or credentials) through Amazon Web Services (AWS). The program utilizes the Rust programming language. In particular, it uses the Rust-Nightly branch of the Rust Language project and is built on top of Rusoto, an AWS SDK that utilizes the AWS API.
+Project Ironclad is a command line utility to effectively create, store and retrieve secrets (or credentials) through Amazon Web Services (AWS). The program utilizes the Rust programming language. In particular, it uses the Rust-Nightly branch of the Rust Language project and is built on top of Rusoto, a AWS SDK that utilizes the AWS API.
 
 ## Usage
 
