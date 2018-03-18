@@ -1,5 +1,40 @@
+extern crate rusoto_core;
+extern crate rusoto_dynamodb;
+extern crate rusoto_credential;
+
+mod tables {
+    use rusoto_core::region::Region;
+    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+
+    pub fn list_tables() -> () {
+        // First grabbing default user credentials from .aws/credentials file
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let list_tables_input: ListTablesInput = Default::default();
+
+        match client.list_tables(&list_tables_input).sync() {
+            Ok(output) => {
+                match output.table_names {
+                    Some(table_name_list) => {
+                        println!("Tables in database:");
+
+                        for table_name in table_name_list {
+                            println!("{}", table_name);
+                        }
+                    },
+                    None => println!("No tables in database!"),
+                }
+            },
+            Err(error) => {
+                println!("Error: {:?}", error);
+            },
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
+    use super::*;
+
     #[test]
     fn t_authenticate_user(){
         // Set AWS Variables to NULL values originally
@@ -8,9 +43,14 @@ mod test {
 
         // Assert equality of AWS environment
         // vars with their expected values
+        assert_eq!(1,1);
     }
 
-    fn t_store_secret(){
-        
+    #[test]
+    fn t_list_tables() {
+        println!("Function Output:\n");
+        tables::list_tables();
+        println!("\n\nExpected output:\n");
+        println!("Tables in databse:\ncredential-store");
     }
 }

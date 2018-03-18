@@ -1,21 +1,31 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
-extern crate crypto;
 extern crate rusoto_core;
 extern crate rusoto_dynamodb;
+extern crate rusoto_credential;
+
+//use rusoto_credential::{ProfileProvider,ProvideAwsCredentials};
+use rusoto_core::region::Region;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 
 fn main() {
-    let mut hash_classes = HashMap::new();
-    hash_classes.insert(String::from("SHA1"),       1);
-    hash_classes.insert(String::from("SHA224"),     2);
-    hash_classes.insert(String::from("SHA256"),     3);
-    hash_classes.insert(String::from("SHA384"),     4);
-    hash_classes.insert(String::from("SHA512"),     5);
-    hash_classes.insert(String::from("RIPEMD"),     6);
-    hash_classes.insert(String::from("WHIRLPOOL"),  7);
-    hash_classes.insert(String::from("MD5"),        8);
+    let client = DynamoDbClient::simple(Region::UsWest2);
+    let list_tables_input: ListTablesInput = Default::default();
 
-    static DEFAULT_DIGEST: &str = "SHA256";
-    println!("{}",DEFAULT_DIGEST);
-    //const HASHING_ALGOS: HashSet<String> = hash_classes.keys();
+    match client.list_tables(&list_tables_input).sync() {
+        Ok(output) => {
+            match output.table_names {
+                Some(table_name_list) => {
+                    println!("Tables in database:");
+
+                    for table_name in table_name_list {
+                        println!("{}", table_name);
+                    }
+                },
+                None => println!("No tables in database!"),
+            }
+        },
+        Err(error) => {
+            println!("Error: {:?}", error);
+        },
+    }
+
 }
