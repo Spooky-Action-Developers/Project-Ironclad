@@ -1,31 +1,24 @@
 extern crate rusoto_core;
 extern crate rusoto_dynamodb;
 extern crate rusoto_credential;
+extern crate clap;
 
-//use rusoto_credential::{ProfileProvider,ProvideAwsCredentials};
 use rusoto_core::region::Region;
 use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+use clap::{Arg, App};
 
 fn main() {
-    let client = DynamoDbClient::simple(Region::UsWest2);
-    let list_tables_input: ListTablesInput = Default::default();
+    let matches = App::new("Ironclad Secret Store")
+        .version("0.1.0")
+        .author("Evan Conley <econmang@gmail.com>\nJacob Cromwell <cromwellj@sou.edu>")
+        .about("ironclad is a utility for storing secret through AWS and DynamoDB tables")
+        .arg(Arg::with_name("action")
+             .required(true)
+             .takes_value(true)
+             .index(1)
+             .help("action to perform in AWS System"))
+        .get_matches();
 
-    match client.list_tables(&list_tables_input).sync() {
-        Ok(output) => {
-            match output.table_names {
-                Some(table_name_list) => {
-                    println!("Tables in database:");
-
-                    for table_name in table_name_list {
-                        println!("{}", table_name);
-                    }
-                },
-                None => println!("No tables in database!"),
-            }
-        },
-        Err(error) => {
-            println!("Error: {:?}", error);
-        },
-    }
-
+    let secret = matches.value_of("action").unwrap();
+    println!("The action you wish to perform is {}", secret);
 }
