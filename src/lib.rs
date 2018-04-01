@@ -2,7 +2,7 @@ extern crate rusoto_core;
 extern crate rusoto_dynamodb;
 extern crate rusoto_credential;
 
-mod tables {
+pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 

@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Evan Conley <econmang@gmail.com>",
            "Jacob Cromwell <cromwellj@sou.edu>"]
 
+[lib]
+name = "iron_lib"
+path = "src/lib.rs"
+
 [dependencies]
 rocket = "0.3.6"
 rocket_codegen = "0.3.6"
