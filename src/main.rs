@@ -14,7 +14,7 @@ fn main() {
     let app_run = App::new("Ironclad Secret Store")
         .version("0.2.0")
         .author("Evan Conley <econmang@gmail.com>\nJacob Cromwell <cromwellj@sou.edu>")
-        .about("ironclad is a utility for storing secrets through AWS and DynamoDB tables")
+        .about("Ironclad is a utility for storing secrets through AWS and DynamoDB tables")
         .subcommand(SubCommand::with_name("put")
                     .about("Stores secret credentials into the AWS system")
                     .arg(Arg::with_name("file")
@@ -42,12 +42,24 @@ fn main() {
                          .help("Specifies the identifier of the secret to be retrieved")
                          .required(true)
                          ))
+        .subcommand(SubCommand::with_name("getall")
+                    .about("Retrieve all secrets from a table")
+                    .arg(Arg::with_name("table")
+                         .short("t")
+                         .long("table")
+                         .help("Choose a table to retrieve secrets from")
+                         .takes_value(true)
+                         .value_name("tableName")
+                         .number_of_values(1)
+                    ))
         .get_matches();
     
 
     /* Adding logic to system and utilizing parsed through informatinon */
     match app_run.subcommand_name() {
-        Some ("list")   => {tables::list_tables();},
+        Some ("list")   => {
+                tables::list_tables();
+        },
         Some("put")     => {},
         Some("get")     => {},
         _               => {},

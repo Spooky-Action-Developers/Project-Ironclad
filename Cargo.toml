@@ -1,6 +1,6 @@
 [package]
 name = "ironclad"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Evan Conley <econmang@gmail.com>",
            "Jacob Cromwell <cromwellj@sou.edu>"]
 
@@ -9,8 +9,6 @@ name = "iron_lib"
 path = "src/lib.rs"
 
 [dependencies]
-rocket = "0.3.6"
-rocket_codegen = "0.3.6"
 rusoto_core = "0.32.0"
 rusoto_kms = "0.32.0"
 rusoto_credential = "0.8.0"
