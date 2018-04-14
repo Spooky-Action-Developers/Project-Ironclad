@@ -1,5 +1,5 @@
 [package]
-name = "project_ironclad"
+name = "ironclad"
 version = "0.1.0"
 authors = ["Evan Conley <econmang@gmail.com>",
            "Jacob Cromwell <cromwellj@sou.edu>"]

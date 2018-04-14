@@ -4,7 +4,7 @@ extern crate rusoto_credential;
 
 pub mod tables {
     use rusoto_core::region::Region;
-    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput,DescribeTableInput};
 
     pub fn list_tables() -> () {
         // First grabbing default user credentials from .aws/credentials file
