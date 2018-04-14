@@ -5,8 +5,6 @@ authors = ["Evan Conley <econmang@gmail.com>",
            "Jacob Cromwell <cromwellj@sou.edu>"]
 
 [dependencies]
-rocket = "0.3.6"
-rocket_codegen = "0.3.6"
 rusoto_core = "0.32.0"
 rusoto_kms = "0.32.0"
 rusoto_credential = "0.8.0"
