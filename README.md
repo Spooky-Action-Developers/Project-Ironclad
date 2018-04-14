@@ -1,6 +1,6 @@
 
 # Project-Ironclad
-|Travis-CI  | ![travis build](https://img.shields.io/travis/Spooky-Action-Developers/Project-Ironclad.svg) |
+|Travis-CI  | ![travis build](https://travis-ci.org/Spooky-Action-Developers/Project-Ironclad.svg?branch=master) |
 |--|--|
 
 ## Installation
