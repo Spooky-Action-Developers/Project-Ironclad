@@ -1,7 +1,13 @@
+extern crate iron_lib;
+extern crate rusoto_core;
+extern crate rusoto_dynamodb;
+extern crate rusoto_credential;
 extern crate clap;
-
+//use rusoto_core::region::Region;
+//use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 
 use clap::{App, AppSettings, SubCommand, Arg};
+use iron_lib::tables;
 
 fn main() {
     let app_matches = App::new("Project Ironclad Secret Store")
@@ -22,11 +28,11 @@ fn main() {
                          .required(true)
                          .help("Identifier with which to store the credential in AWS.")
                     )
-                    .about("Store a credential through AWS.")
                     .arg(Arg::with_name("secret")
                          .help("String to be stored at command line")
                          //.required_unless("fileName")
                          )
+                    .about("Store a credential through AWS.")
                     .arg(Arg::with_name("fileName")
                          .short("f")
                          .long("file")
@@ -108,7 +114,7 @@ fn main() {
             println!("I'd be attempting to list tables from specified region.");
         }
         else {
-            println!("I'd be attempting to list tables from default region.");
+           tables::list_tables_default(); 
         }
     }
     else if let Some(x) = app_matches.subcommand_matches("put") {
@@ -127,8 +133,8 @@ fn main() {
                     eprintln!("ERROR: Too many arguments for storage.");
                 }
                 else {
-                println!("Attempting to store file: {:?} with identifier {:?} in default table.",
-                         x.value_of("fileName").unwrap(), x.value_of("identifier").unwrap());
+                        println!("Attempting to store file: {:?} with identifier {:?} in default table.",
+                                 x.value_of("fileName").unwrap(), x.value_of("identifier").unwrap());
                 }
 
             }
@@ -137,8 +143,13 @@ fn main() {
                          x.value_of("secret").unwrap(), x.value_of("identifier").unwrap(),  x.value_of("table").unwrap());
             }
             else {
-                println!("Attempting to store {:?} with name {:?} in default table",
-                         x.value_of("secret").unwrap(), x.value_of("identifier").unwrap());
+                if x.is_present("secret") {
+                    println!("Attempting to store {:?} with name {:?} in default table",
+                             x.value_of("secret").unwrap(), x.value_of("identifier").unwrap());
+                }
+                else {
+                    eprintln!("ERROR: Missing required argument: 'secret' for storage.");
+                }
             }
         }
     }

@@ -6,8 +6,8 @@ pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput,DescribeTableInput};
 
-    pub fn list_tables() -> () {
-        // First grabbing default user credentials from .aws/credentials file
+    pub fn list_tables_default() -> () {
+        // First grabbing user credentials from .aws/credentials file
         let client = DynamoDbClient::simple(Region::UsWest2);
         let list_tables_input: ListTablesInput = Default::default();
 
@@ -29,6 +29,26 @@ pub mod tables {
             },
         }
     }
+
+    pub fn list_table_region() -> () {
+    //First grabbing user credentials from .aws/credentials file
+    let client = DynamoDBClient::simple(Region::UsWest2);
+    let list_tables_input: ListTablesInput = Default::default();
+
+    match client.list_tables(&list_tables_input).sync() {
+        Ok(output) => {
+            match output.table_names {
+                Some(table_name_list) => {
+                    println!("Tables in databse:");
+
+                    for table_name in table_name_list {
+                        println!("{}", table_name);
+                    }
+                },
+            }
+        }
+    }
+    }
 }
 
 #[cfg(test)]
@@ -49,7 +69,7 @@ mod test {
     #[test]
     fn t_list_tables() {
         println!("Function Output:\n");
-        tables::list_tables();
+        tables::list_tables_default();
         println!("\n\nExpected output:\n");
         println!("Tables in databse:\ncredential-store");
     }
