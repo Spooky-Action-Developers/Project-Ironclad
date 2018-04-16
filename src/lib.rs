@@ -32,7 +32,7 @@ pub mod tables {
 
     pub fn list_table_region() -> () {
     //First grabbing user credentials from .aws/credentials file
-    let client = DynamoDBClient::simple(Region::UsWest2);
+    let client = DynamoDbClient::simple(Region::UsWest2);
     let list_tables_input: ListTablesInput = Default::default();
 
     match client.list_tables(&list_tables_input).sync() {
@@ -45,7 +45,11 @@ pub mod tables {
                         println!("{}", table_name);
                     }
                 },
+                None => println!("No tables in database!"),
             }
+        },
+        Err(error) => {
+            println!("Error: {:?}", error);
         }
     }
     }
