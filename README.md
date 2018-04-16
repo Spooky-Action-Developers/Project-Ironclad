@@ -23,7 +23,142 @@ Project Ironclad is a command line utility to effectively create, store and retr
 
 ## Usage
 
-**_NOTE_**: We are currently in the early stages of learning to implement Rusoto in the project and, so, usage has yet to be fulfilled. As of now, the project is a set of small test functions to establish that we have server connectivity and the ability to handle data inside of the DynamoDB tables stored through AWS.
+```
+Project Ironclad Secret Store 0.2.0
+Evan Conley <econmang@gmail.com>
+Jacob Cromwell <cromwellj@sou.edu>
+Ironclad is a command line utility to help store and manage secret credentials through AWS.
+
+USAGE:
+    ironclad <SUBCOMMAND>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    delete    Delete specified secret from DynamoDB Table.
+    get       Retrieve a secret credential from a DynamoDB Table.
+    getall    Retrieve all secret credentials from a DynamoDB Table.
+    help      Prints this message or the help of the given subcommand(s)
+    list      List DynamoDB tables associated with a given region.
+    put       Store a credential through AWS.
+    setup     Setup new DynamoDB Table through AWS.
+    view      View credentials in specified DynamoDB Table.
+
+
+
+
+SUBCOMMAND BREAKDOWN:
+
+delete 
+Delete specified secret from DynamoDB Table.
+
+USAGE:
+    ironclad delete [OPTIONS] <identifier>
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -t, --table <TABLE>    Specifies name of table to find credential.
+
+ARGS:
+    <identifier>    Name of secreet to be deleted from DynamoDB Table.
+
+------------------------------------------------------------------------
+
+get 
+Retrieve a secret credential from a DynamoDB Table.
+
+USAGE:
+    ironclad get [OPTIONS] <identifier>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -t, --table <TABLE>    Indicates a table to retrieve from.
+
+ARGS:
+    <identifier>    Name of credential to be retrieved.
+
+------------------------------------------------------------------------
+
+getall 
+Retrieve all secret credentials from a DynamoDB Table.
+
+USAGE:
+    ironclad getall [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -t, --table <TABLE>    Indicates a table to retrieve from.
+
+------------------------------------------------------------------------
+
+list 
+List DynamoDB tables associated with a given region.
+
+USAGE:
+    ironclad list [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -r, --region <REGION>    Sets region to list tables from. If not set, uses default region setting.
+
+------------------------------------------------------------------------
+
+put 
+Store a credential through AWS.
+
+USAGE:
+    ironclad put [OPTIONS] <identifier> [secret]
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -f, --file <FILE>      Path to the file to be stored.
+    -t, --table <TABLE>    Specify which table to store secret credential in.
+
+ARGS:
+    <identifier>    Identifier with which to store the credential in AWS.
+    <secret>        String to be stored at command line
+
+------------------------------------------------------------------------
+
+setup 
+Setup new DynamoDB Table through AWS.
+
+USAGE:
+    ironclad setup [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -n, --name <NAME>    indicates name of table to be setup with default values
+
+------------------------------------------------------------------------
+
+view 
+View credentials in specified DynamoDB Table.
+
+USAGE:
+    ironclad view [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+
+OPTIONS:
+    -t, --table <TABLE>    Indicates a table to view other than default.
+```
 
 ## License
 

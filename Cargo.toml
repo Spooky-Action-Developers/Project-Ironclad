@@ -1,8 +1,12 @@
 [package]
-name = "project_ironclad"
-version = "0.1.0"
+name = "ironclad"
+version = "0.2.0"
 authors = ["Evan Conley <econmang@gmail.com>",
            "Jacob Cromwell <cromwellj@sou.edu>"]
+
+[lib]
+name = "iron_lib"
+path = "src/lib.rs"
 
 [dependencies]
 rusoto_core = "0.32.0"
@@ -10,4 +14,4 @@ rusoto_kms = "0.32.0"
 rusoto_credential = "0.8.0"
 rusoto_iam = "0.32.0"
 rusoto_dynamodb = "0.32.0"
-rust-crypto = "0.2.36"
+clap = "2.26.0"
