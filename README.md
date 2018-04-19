@@ -36,8 +36,8 @@ aws_secret_key_id = KIDTOYEXAMPLEASDAFAD
 aws_secret_access_key = TOYEXAMPLE12341231
 ```
 
-Then, by setting the ```AWS_PROFILE``` environment variable [i.e. switch] you can point ironclad in
-at the appropriate account.
+Then, by setting the ```AWS_PROFILE``` environment variable (i.e. ```export AWS_PROFILE=switch```) you can point ironclad
+at the appropriate account to use for validation.
 
 ## Usage
 
