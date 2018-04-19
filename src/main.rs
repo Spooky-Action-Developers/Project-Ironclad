@@ -8,9 +8,19 @@ extern crate clap;
 
 use clap::{App, AppSettings, SubCommand, Arg};
 use iron_lib::tables;
+use rusoto_dynamodb::{DynamoDbClient, ListTablesInput};
+use rusoto_dynamodb::{
+    AttributeDefinition,
+    AttributeValue,
+    CreateTableInput,
+    GetItemInput,
+    GetItemOutput,
+    KeySchemaElement,
+    PutItemInput,
+};
 
 fn main() {
-    
+
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
     let regions= vec!["apnortheast1","apnortheast2","apsouth1","apsoutheast1","apsoutheast2","cacentral1","eucentral1",
@@ -80,7 +90,7 @@ fn main() {
                          .required(true)
                          .help("Name of secreet to be deleted from DynamoDB Table.")
                          ))
-        //Subcommand information/flags for `setup` subcommand 
+        //Subcommand information/flags for `setup` subcommand
         //creates table
         .subcommand(SubCommand::with_name("setup")
                     .about("Setup new DynamoDB Table through AWS.")
@@ -201,6 +211,14 @@ fn main() {
     else if let Some(x) = app_matches.subcommand_matches("delete") {
         if x.is_present("tableName") {
             println!("I'd be attempting to delete {:?} from table {:?}.", x.value_of("identifier").unwrap(), x.value_of("tableName").unwrap());
+            let input = CreateTableInput::new()
+                                                        .with_name(x.value_of("name"))
+                                                        .with_write_capacity(1)
+                                                        .with_read_capacity(1)
+                                                        .with_attributes(attributes!("string" => "S", "number" => "N"))
+                                                        .with_key_schema(key_schema!("string" => "HASH", "number" => "RANGE"));
+                        let _result = try!(dynamodb.create_table(&input));
+                        Ok(());
         }
         else {
             println!("I'd be attempting to delete {:?} from default table.", x.value_of("identifier").unwrap());

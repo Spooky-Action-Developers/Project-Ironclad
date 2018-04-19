@@ -6,6 +6,58 @@ pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 
+    pub mod helpers {
+        #[macro_export]
+        macro_rules! attributes {
+            ($($val:expr => $attr_type:expr),*) => {
+                {
+                    let mut temp_vec = Vec::new();
+                    $(
+                        temp_vec.push(AttributeDefinition { attribute_name: String::from($val), attribute_type: String::from($attr_type) });
+                    )*
+                    temp_vec
+                }
+            }
+        }
+
+        #[macro_export]
+        macro_rules! key_schema {
+            ($($name:expr => $key_type:expr),*) => {
+                {
+                    let mut temp_vec = Vec::new();
+                    $(
+                        temp_vec.push(KeySchemaElement { key_type: String::from($key_type), attribute_name: String::from($name) });
+                    )*
+                    temp_vec
+                }
+            }
+        }
+
+        #[macro_export]
+        macro_rules! val {
+        	(B => $val:expr) => (
+        	    {
+        	    	let mut attr = AttributeValue::default();
+        	    	attr.b = Some($val);
+        	    	attr
+        	    }
+        	);
+        	(S => $val:expr) => (
+        	    {
+        			let mut attr = AttributeValue::default();
+        			attr.s = Some($val.to_string());
+        			attr
+        		}
+        	);
+        	(N => $val:expr) => (
+        	    {
+        	    	let mut attr = AttributeValue::default();
+        	    	attr.n = Some($val.to_string());
+        	    	attr
+        	    }
+        	);
+        }
+    }
     pub fn list_tables_default() -> () {
         // First grabbing user credentials from .aws/credentials file
         let client = DynamoDbClient::simple(Region::UsWest2);
@@ -62,7 +114,7 @@ pub mod tables {
         Ok(output) => {
             match output.table_names {
                 Some(table_name_list) => {
-                    println!("Tables in database:"); 
+                    println!("Tables in database:");
 
                     for table_name in table_name_list {
                         println!("{}", table_name);
