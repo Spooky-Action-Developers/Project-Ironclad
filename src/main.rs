@@ -211,14 +211,7 @@ fn main() {
     else if let Some(x) = app_matches.subcommand_matches("delete") {
         if x.is_present("tableName") {
             println!("I'd be attempting to delete {:?} from table {:?}.", x.value_of("identifier").unwrap(), x.value_of("tableName").unwrap());
-            let input = CreateTableInput::new()
-                                                        .with_name(x.value_of("name"))
-                                                        .with_write_capacity(1)
-                                                        .with_read_capacity(1)
-                                                        .with_attributes(attributes!("string" => "S", "number" => "N"))
-                                                        .with_key_schema(key_schema!("string" => "HASH", "number" => "RANGE"));
-                        let _result = try!(dynamodb.create_table(&input));
-                        Ok(());
+
         }
         else {
             println!("I'd be attempting to delete {:?} from default table.", x.value_of("identifier").unwrap());
@@ -227,6 +220,14 @@ fn main() {
     else if let Some(x) = app_matches.subcommand_matches("setup") {
         if x.is_present("name") {
             println!("I'd be attempting to create table with name: {:?}", x.value_of("name").unwrap());
+            let input = CreateTableInput::new()
+                                                        .with_name(x.value_of("name"))
+                                                        .with_write_capacity(1)
+                                                        .with_read_capacity(1)
+                                                        .with_attributes(attributes!("string" => "S", "number" => "N"))
+                                                        .with_key_schema(key_schema!("string" => "HASH", "number" => "RANGE"));
+                        let _result = try!(dynamodb.create_table(&input));
+                        Ok(());
         }
         else {
             println!("I'd be attempting to create default table \"ironclad-store\"");
