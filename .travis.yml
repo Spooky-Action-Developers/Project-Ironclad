@@ -3,6 +3,13 @@ cache:
   - cargo: true
 rust:
   - nightly
+env:
+  - CLIPPY_VERSION=0.0.195
+before_script:
+  - rustup component add rustfmt-preview
+  - cargo install clippy --veresion $CLIPPY_VERSION || echo "clippy already installed"
 script:
+  - cargo fmt -- --write-mode=diff
+  - cargo clippy -- -D clippy
   - cargo build --verbose --all
   - cargo test --verbose --all
