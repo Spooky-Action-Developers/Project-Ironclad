@@ -5,13 +5,11 @@ extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 
 use clap::{App, AppSettings, Arg, SubCommand};
-use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
 use iron_lib::*;
 use rusoto_core::region::Region;
 use rusoto_dynamodb::*;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
-use std::collections::HashMap;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
 
 fn main() {
     let client = DynamoDbClient::simple(Region::UsWest2);
@@ -152,6 +150,14 @@ fn main() {
                          .takes_value(true)
                          .value_name("TABLE")
                          ))
+        //Subcommand information/flags for `delete-table` command
+        //Deletes specified table from AWS
+        .subcommand(SubCommand::with_name("delete-table")
+                    .about("Delete specified table from AWS.")
+                    .arg(Arg::with_name("tableName")
+                         .help("Table to be deleted.")
+                         .required(true))
+                    )
         //Required subcommand
         .setting(AppSettings::SubcommandRequired)
         .get_matches();
@@ -307,5 +313,10 @@ fn main() {
                 x.value_of("identifier").unwrap()
             );
         }
+    } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
+        println!(
+            "Attempting to delete table: {:?}",
+            x.value_of("tableName").unwrap()
+        );
     }
 }
