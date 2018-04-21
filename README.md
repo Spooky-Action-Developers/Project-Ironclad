@@ -55,14 +55,15 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    delete    Delete specified secret from DynamoDB Table.
-    get       Retrieve a secret credential from a DynamoDB Table.
-    getall    Retrieve all secret credentials from a DynamoDB Table.
-    help      Prints this message or the help of the given subcommand(s)
-    list      List DynamoDB tables associated with a given region.
-    put       Store a credential through AWS.
-    setup     Setup new DynamoDB Table through AWS.
-    view      View credentials in specified DynamoDB Table.
+    delete          Delete specified secret from DynamoDB Table.
+    delete-table    Delete specified table from DynamoDB.
+    get             Retrieve a secret credential from a DynamoDB Table.
+    getall          Retrieve all secret credentials from a DynamoDB Table.
+    help            Prints this message or the help of the given subcommand(s)
+    list            List DynamoDB tables associated with a given region.
+    put             Store a credential through AWS.
+    setup           Setup new DynamoDB Table through AWS.
+    view            View credentials in specified DynamoDB Table.
 
 
 
@@ -176,6 +177,21 @@ FLAGS:
 
 OPTIONS:
     -t, --table <TABLE>    Indicates a table to view other than default.
+
+-------------------------------------------------------------------------
+delete-table 
+Delete specified table from AWS.
+
+USAGE:
+    ironclad delete-table <tableName>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+ARGS:
+    <tableName>    Table to be deleted.
+
 ```
 
 ## License
