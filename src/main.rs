@@ -3,13 +3,18 @@ extern crate iron_lib;
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
-//use rusoto_core::region::Region;
-//use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 
 use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
+use iron_lib::*;
+use rusoto_core::region::Region;
+use rusoto_dynamodb::*;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+use std::collections::HashMap;
 
 fn main() {
+    let client = DynamoDbClient::simple(Region::UsWest2);
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
     let regions = vec![
@@ -96,7 +101,7 @@ fn main() {
                          .required(true)
                          .help("Name of secreet to be deleted from DynamoDB Table.")
                          ))
-        //Subcommand information/flags for `setup` subcommand 
+        //Subcommand information/flags for `setup` subcommand
         //creates table
         .subcommand(SubCommand::with_name("setup")
                     .about("Setup new DynamoDB Table through AWS.")
@@ -240,8 +245,36 @@ fn main() {
                 "I'd be attempting to create table with name: {:?}",
                 x.value_of("name").unwrap()
             );
+            let new_table_name = x.value_of("name").unwrap();
+            let mut table_creator = CreateTableInput::default();
+            println!("Creating table {} ", new_table_name);
+            let mut read_capacity = 1;
+            let mut write_capacity = 1;
+            table_creator.table_name = new_table_name.to_string();
+            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
+            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
+            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
+            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+            client
+                .create_table(&table_creator)
+                .sync()
+                .expect("Not working");
+            println!("Table name is {}", table_creator.table_name);
         } else {
             println!("I'd be attempting to create default table \"ironclad-store\"");
+            let mut table_creator = CreateTableInput::default();
+            let mut read_capacity = 1;
+            let mut write_capacity = 1;
+            table_creator.table_name = "Ironclad-store".to_string();
+            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
+            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
+            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
+            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+            client
+                .create_table(&table_creator)
+                .sync()
+                .expect("Not working");
+            println!("Table name is {}", table_creator.table_name);
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {

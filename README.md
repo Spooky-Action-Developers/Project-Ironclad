@@ -1,6 +1,6 @@
 
 # Project-Ironclad
-|Travis-CI  | ![travis build](https://img.shields.io/travis/Spooky-Action-Developers/Project-Ironclad.svg) |
+|Travis-CI  | ![travis build](https://travis-ci.org/Spooky-Action-Developers/Project-Ironclad.svg?branch=master) |
 |--|--|
 
 ## Installation
@@ -20,6 +20,24 @@ cargo run
 ## Description
 
 Project Ironclad is a command line utility to effectively create, store and retrieve secrets (or credentials) through Amazon Web Services (AWS). The program utilizes the Rust programming language. In particular, it uses the Rust-Nightly branch of the Rust Language project and is built on top of Rusoto, a AWS SDK that utilizes the AWS API.
+
+## Working With Multiple AWS Accounts (profiles)
+
+If you are working with multiple AWS accounts, you can set multiple profiles in the ```~/.aws/credentials```
+file. For example:
+
+```
+[default]
+aws_access_key_id = KIDTOYEXAMPLEASDAFAD
+aws_secret_access_key = TOYEXAMPLE12341231
+
+[switch]
+aws_secret_key_id = KIDTOYEXAMPLEASDAFAD
+aws_secret_access_key = TOYEXAMPLE12341231
+```
+
+Then, by setting the ```AWS_PROFILE``` environment variable (i.e. ```export AWS_PROFILE=switch```) you can point ironclad
+at the appropriate account to use for validation.
 
 ## Usage
 
@@ -51,7 +69,7 @@ SUBCOMMANDS:
 
 SUBCOMMAND BREAKDOWN:
 
-delete 
+delete
 Delete specified secret from DynamoDB Table.
 
 USAGE:
@@ -68,7 +86,7 @@ ARGS:
 
 ------------------------------------------------------------------------
 
-get 
+get
 Retrieve a secret credential from a DynamoDB Table.
 
 USAGE:
@@ -86,7 +104,7 @@ ARGS:
 
 ------------------------------------------------------------------------
 
-getall 
+getall
 Retrieve all secret credentials from a DynamoDB Table.
 
 USAGE:
@@ -100,7 +118,7 @@ OPTIONS:
 
 ------------------------------------------------------------------------
 
-list 
+list
 List DynamoDB tables associated with a given region.
 
 USAGE:
@@ -114,7 +132,7 @@ OPTIONS:
 
 ------------------------------------------------------------------------
 
-put 
+put
 Store a credential through AWS.
 
 USAGE:
@@ -133,7 +151,7 @@ ARGS:
 
 ------------------------------------------------------------------------
 
-setup 
+setup
 Setup new DynamoDB Table through AWS.
 
 USAGE:
@@ -147,7 +165,7 @@ OPTIONS:
 
 ------------------------------------------------------------------------
 
-view 
+view
 View credentials in specified DynamoDB Table.
 
 USAGE:
