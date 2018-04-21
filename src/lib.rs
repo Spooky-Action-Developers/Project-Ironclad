@@ -2,8 +2,8 @@ extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 use rusoto_dynamodb::*;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
 
 #[macro_export]
 macro_rules! attributes {
@@ -34,27 +34,21 @@ macro_rules! key_schema {
 }
 #[macro_export]
 macro_rules! val {
-	(B => $val:expr) => (
-	    {
-	    	let mut attr = AttributeValue::default();
-	    	attr.b = Some($val);
-	    	attr
-	    }
-	);
-	(S => $val:expr) => (
-	    {
-			let mut attr = AttributeValue::default();
-			attr.s = Some($val.to_string());
-			attr
-		}
-	);
-	(N => $val:expr) => (
-	    {
-	    	let mut attr = AttributeValue::default();
-	    	attr.n = Some($val.to_string());
-	    	attr
-	    }
-	);
+    (B => $val:expr) => {{
+        let mut attr = AttributeValue::default();
+        attr.b = Some($val);
+        attr
+    }};
+    (S => $val:expr) => {{
+        let mut attr = AttributeValue::default();
+        attr.s = Some($val.to_string());
+        attr
+    }};
+    (N => $val:expr) => {{
+        let mut attr = AttributeValue::default();
+        attr.n = Some($val.to_string());
+        attr
+    }};
 }
 
 pub mod tables {
