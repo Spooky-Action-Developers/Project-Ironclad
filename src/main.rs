@@ -7,8 +7,8 @@ extern crate rusoto_dynamodb;
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::*;
 use rusoto_core::region::Region;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 use rusoto_dynamodb::*;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 use std::collections::HashMap;
 
 fn main() {
