@@ -7,7 +7,7 @@ matrix:
     env:
       - CLIPPY_VERSION=0.0.195
     before_script:
-      - cargo install clippy --veresion $CLIPPY_VERSION || echo "clippy already installed"
+      - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
     script:
       - cargo clippy
       - cargo build --verbose --all
