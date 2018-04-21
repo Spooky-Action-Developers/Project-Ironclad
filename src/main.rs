@@ -279,7 +279,7 @@ fn main() {
             client
                 .create_table(&table_creator)
                 .sync()
-                .expect("Not working");
+                .expect("Create default table failed.");
             println!("Table name is {}", table_creator.table_name);
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
@@ -318,5 +318,13 @@ fn main() {
             "Attempting to delete table: {:?}",
             x.value_of("tableName").unwrap()
         );
+        let mut table_deleter = DeleteTableInput::default();
+        let mut new_delete_table = x.value_of("tableName").unwrap();
+        table_deleter.table_name = new_delete_table.to_string();
+        client
+            .delete_table(&table_deleter)
+            .sync()
+            .expect("Delete Table Failed.");
+        println!("Successfully deleted {:?}", new_delete_table);
     }
 }
