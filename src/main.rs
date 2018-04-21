@@ -1,21 +1,37 @@
+extern crate clap;
 extern crate iron_lib;
 extern crate rusoto_core;
-extern crate rusoto_dynamodb;
 extern crate rusoto_credential;
-extern crate clap;
+extern crate rusoto_dynamodb;
 //use rusoto_core::region::Region;
 //use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
 
-use clap::{App, AppSettings, SubCommand, Arg};
+use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
 
 fn main() {
-    
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
-    let regions= vec!["apnortheast1","apnortheast2","apsouth1","apsoutheast1","apsoutheast2","cacentral1","eucentral1",
-                    "euwest1","euwest2","euwest3","saeast1","useast1","useast2","uswest1","uswest2","usgovwest1",
-                    "cnnorth1","cnnorthwest1"];
+    let regions = vec![
+        "apnortheast1",
+        "apnortheast2",
+        "apsouth1",
+        "apsoutheast1",
+        "apsoutheast2",
+        "cacentral1",
+        "eucentral1",
+        "euwest1",
+        "euwest2",
+        "euwest3",
+        "saeast1",
+        "useast1",
+        "useast2",
+        "uswest1",
+        "uswest2",
+        "usgovwest1",
+        "cnnorth1",
+        "cnnorthwest1",
+    ];
 
     /*Start of program logic. This will be used to gather and parse passed arguments from the user.
      * Assesses subcommand, flags, and values passed to each.
@@ -135,7 +151,6 @@ fn main() {
         .setting(AppSettings::SubcommandRequired)
         .get_matches();
 
-
     /*Program logic:
      * Uses subcommand_matches to locate which subcommand was utilized
      *      Error if none was used, or if typed incorrectly
@@ -144,98 +159,120 @@ fn main() {
      * Returns specified information with helpful messages*/
 
     if let Some(x) = app_matches.subcommand_matches("list") {
-        if x.is_present("region") { //check if region was set
+        if x.is_present("region") {
+            //check if region was set
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
-                Some(reg)   =>  {tables::list_tables_region(reg);},     //if region correctly parsed, list tables in region
-                None        =>  {                                       //else: display error informing what values can be used
-                                    eprintln!("Error: Region not correctly specified...\n");
-                                    let mut reg_list_string = "";
-                                    eprintln!("Must be in list:{}", reg_list_string);
-                                    for region in regions {
-                                        println!("{}", region);
-                                    }
-                                },
+                Some(reg) => {
+                    tables::list_tables_region(reg);
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
             }
+        } else {
+            tables::list_tables_default(); //region flag not set, list default table: uswest2
         }
-        else {
-           tables::list_tables_default(); //region flag not set, list default table: uswest2
-        }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("put") {
+    } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
             if x.is_present("fileName") && x.is_present("table") {
                 if x.is_present("secret") {
                     eprintln!("ERROR: Too many arguments for storage.");
+                } else {
+                    println!(
+                        "Attempting to store file: {:?} with identifier {:?} in table: {:?}",
+                        x.value_of("fileName").unwrap(),
+                        x.value_of("identifier").unwrap(),
+                        x.value_of("table").unwrap()
+                    );
                 }
-                else {
-                    println!("Attempting to store file: {:?} with identifier {:?} in table: {:?}",
-                         x.value_of("fileName").unwrap(), x.value_of("identifier").unwrap(), x.value_of("table").unwrap());
-                }
-            }
-            else if x.is_present("fileName") {
+            } else if x.is_present("fileName") {
                 if x.is_present("secret") {
                     eprintln!("ERROR: Too many arguments for storage.");
+                } else {
+                    println!(
+                        "Attempting to store file: {:?} with identifier {:?} in default table.",
+                        x.value_of("fileName").unwrap(),
+                        x.value_of("identifier").unwrap()
+                    );
                 }
-                else {
-                        println!("Attempting to store file: {:?} with identifier {:?} in default table.",
-                                 x.value_of("fileName").unwrap(), x.value_of("identifier").unwrap());
-                }
-
-            }
-            else if x.is_present("table") {
-                println!("Attmepting to store {:?} with name {:?} in table: {:?}",
-                         x.value_of("secret").unwrap(), x.value_of("identifier").unwrap(),  x.value_of("table").unwrap());
-            }
-            else {
+            } else if x.is_present("table") {
+                println!(
+                    "Attmepting to store {:?} with name {:?} in table: {:?}",
+                    x.value_of("secret").unwrap(),
+                    x.value_of("identifier").unwrap(),
+                    x.value_of("table").unwrap()
+                );
+            } else {
                 if x.is_present("secret") {
-                    println!("Attempting to store {:?} with name {:?} in default table",
-                             x.value_of("secret").unwrap(), x.value_of("identifier").unwrap());
-                }
-                else {
+                    println!(
+                        "Attempting to store {:?} with name {:?} in default table",
+                        x.value_of("secret").unwrap(),
+                        x.value_of("identifier").unwrap()
+                    );
+                } else {
                     eprintln!("ERROR: Missing required argument: 'secret' for storage.");
                 }
             }
         }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("delete") {
+    } else if let Some(x) = app_matches.subcommand_matches("delete") {
         if x.is_present("tableName") {
-            println!("I'd be attempting to delete {:?} from table {:?}.", x.value_of("identifier").unwrap(), x.value_of("tableName").unwrap());
+            println!(
+                "I'd be attempting to delete {:?} from table {:?}.",
+                x.value_of("identifier").unwrap(),
+                x.value_of("tableName").unwrap()
+            );
+        } else {
+            println!(
+                "I'd be attempting to delete {:?} from default table.",
+                x.value_of("identifier").unwrap()
+            );
         }
-        else {
-            println!("I'd be attempting to delete {:?} from default table.", x.value_of("identifier").unwrap());
-        }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("setup") {
+    } else if let Some(x) = app_matches.subcommand_matches("setup") {
         if x.is_present("name") {
-            println!("I'd be attempting to create table with name: {:?}", x.value_of("name").unwrap());
-        }
-        else {
+            println!(
+                "I'd be attempting to create table with name: {:?}",
+                x.value_of("name").unwrap()
+            );
+        } else {
             println!("I'd be attempting to create default table \"ironclad-store\"");
         }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("view") {
+    } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {
-            println!("I'd be attempting to list the secrets in the table specified: {:?}", x.value_of("table").unwrap());
-        }
-        else {
+            println!(
+                "I'd be attempting to list the secrets in the table specified: {:?}",
+                x.value_of("table").unwrap()
+            );
+        } else {
             println!("I'd be attemtping to list the secrets in the default table.");
         }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("getall") {
-        if x.is_present("table"){
-            println!("I'd be attempting to retrieve all secrets from: {:?}", x.value_of("table").unwrap());
-        }
-        else {
+    } else if let Some(x) = app_matches.subcommand_matches("getall") {
+        if x.is_present("table") {
+            println!(
+                "I'd be attempting to retrieve all secrets from: {:?}",
+                x.value_of("table").unwrap()
+            );
+        } else {
             println!("I'd be attempting to retrieve all secrets from default table.");
         }
-    }
-    else if let Some(x) = app_matches.subcommand_matches("get") {
-        if x.is_present("table"){
-            println!("I'd be attempting to retrieve {:?} from: {:?}", x.value_of("identifier").unwrap(), x.value_of("table").unwrap());
-        }
-        else {
-            println!("I'd be attempting to retrieve {:?} from default table.", x.value_of("identifier").unwrap());
+    } else if let Some(x) = app_matches.subcommand_matches("get") {
+        if x.is_present("table") {
+            println!(
+                "I'd be attempting to retrieve {:?} from: {:?}",
+                x.value_of("identifier").unwrap(),
+                x.value_of("table").unwrap()
+            );
+        } else {
+            println!(
+                "I'd be attempting to retrieve {:?} from default table.",
+                x.value_of("identifier").unwrap()
+            );
         }
     }
 }
