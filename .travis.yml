@@ -1,14 +1,15 @@
 language: rust
+sudo: false
 cache:
   - cargo: true
-matrix:
-  include:
-    - rust: nightly
-    env:
-      - CLIPPY_VERSION=0.0.195
-    before_script:
-      - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
-    script:
-      - cargo build --verbose --all
-      - cargo test --verbose --all
-      - cargo clippy
+rust: nightly
+    
+env:
+  global:
+    - CLIPPY_VERSION=0.0.195
+before_script:
+  - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
+script:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
+  - cargo clippy
