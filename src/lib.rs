@@ -3,7 +3,7 @@ extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 
 use rusoto_dynamodb::*;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
 
 #[macro_export]
 macro_rules! attributes {
