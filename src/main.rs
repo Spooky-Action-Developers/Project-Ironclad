@@ -5,6 +5,7 @@ extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 
 use clap::{App, AppSettings, Arg, SubCommand};
+use iron_lib::tables;
 use iron_lib::*;
 use rusoto_core::region::Region;
 use rusoto_dynamodb::*;
