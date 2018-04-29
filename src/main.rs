@@ -197,7 +197,7 @@ fn main() {
                 }
             }
         } else {
-            tables::list_tables_default(); //region flag not set, list default table: uswest2
+            tables::list_tables_default(); //region flag not set, list default region
         }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
@@ -256,10 +256,6 @@ fn main() {
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
         if x.is_present("name") {
-            println!(
-                "I'd be attempting to create table with name: {:?}",
-                x.value_of("name").unwrap()
-            );
             let new_table_name = x.value_of("name").unwrap();
             let mut table_creator = CreateTableInput::default();
             println!("Creating table {} ", new_table_name);
@@ -276,20 +272,7 @@ fn main() {
                 .expect("Not working");
             println!("Table name is {}", table_creator.table_name);
         } else {
-            println!("I'd be attempting to create default table \"ironclad-store\"");
-            let mut table_creator = CreateTableInput::default();
-            let mut read_capacity = 1;
-            let mut write_capacity = 1;
-            table_creator.table_name = "Ironclad-store".to_string();
-            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
-            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
-            client
-                .create_table(&table_creator)
-                .sync()
-                .expect("Create default table failed.");
-            println!("Table name is {}", table_creator.table_name);
+            tables::table_create_default();
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {

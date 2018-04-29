@@ -2,58 +2,56 @@ extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 
-use rusoto_dynamodb::*;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
-
-#[macro_export]
-macro_rules! attributes {
-    ($($val:expr => $attr_type:expr),*) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push(AttributeDefinition { attribute_name: String::from($val),
-                                attribute_type: String::from($attr_type) });
-            )*
-            temp_vec
-        }
-    }
-}
-
-#[macro_export]
-macro_rules! key_schema {
-    ($($name:expr => $key_type:expr),*) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push(KeySchemaElement { key_type: String::from($key_type),
-                                attribute_name: String::from($name) });
-            )*
-            temp_vec
-        }
-    }
-}
-#[macro_export]
-macro_rules! val {
-    (B => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.b = Some($val);
-        attr
-    }};
-    (S => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.s = Some($val.to_string());
-        attr
-    }};
-    (N => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.n = Some($val.to_string());
-        attr
-    }};
-}
-
 pub mod tables {
     use rusoto_core::region::Region;
-    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput};
+    use rusoto_dynamodb::*;
+    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput, CreateTableInput};
+
+    #[macro_export]
+    macro_rules! attributes {
+        ($($val:expr => $attr_type:expr),*) => {
+            {
+                let mut temp_vec = Vec::new();
+                $(
+                    temp_vec.push(AttributeDefinition { attribute_name: String::from($val),
+                                    attribute_type: String::from($attr_type) });
+                )*
+                temp_vec
+            }
+        }
+    }
+
+    #[macro_export]
+    macro_rules! key_schema {
+        ($($name:expr => $key_type:expr),*) => {
+            {
+                let mut temp_vec = Vec::new();
+                $(
+                    temp_vec.push(KeySchemaElement { key_type: String::from($key_type),
+                                    attribute_name: String::from($name) });
+                )*
+                temp_vec
+            }
+        }
+    }
+    #[macro_export]
+    macro_rules! val {
+        (B => $val:expr) => {{
+            let mut attr = AttributeValue::default();
+            attr.b = Some($val);
+            attr
+        }};
+        (S => $val:expr) => {{
+            let mut attr = AttributeValue::default();
+            attr.s = Some($val.to_string());
+            attr
+        }};
+        (N => $val:expr) => {{
+            let mut attr = AttributeValue::default();
+            attr.n = Some($val.to_string());
+            attr
+        }};
+    }
 
     pub fn list_tables_default() -> () {
         // First grabbing user credentials from .aws/credentials file
@@ -120,6 +118,23 @@ pub mod tables {
                 println!("Error: {:?}", error);
             }
         }
+    }
+
+    pub fn table_create_default() {
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let mut table_creator = CreateTableInput::default();
+        let read_capacity = 1;
+        let write_capacity = 1;
+        table_creator.table_name = "ironclad-store".to_string();
+        table_creator.provisioned_throughput.read_capacity_units = read_capacity;
+        table_creator.provisioned_throughput.write_capacity_units = write_capacity;
+        table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
+        table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+        client
+            .create_table(&table_creator)
+            .sync()
+            .expect("Create default table failed.");
+        println!("Table name is {}", table_creator.table_name);
     }
 }
 
