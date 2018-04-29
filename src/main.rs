@@ -255,23 +255,41 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
-        if x.is_present("name") {
-            let new_table_name = x.value_of("name").unwrap();
-            let mut table_creator = CreateTableInput::default();
-            println!("Creating table {} ", new_table_name);
-            let mut read_capacity = 1;
-            let mut write_capacity = 1;
-            table_creator.table_name = new_table_name.to_string();
-            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
-            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
-            client
-                .create_table(&table_creator)
-                .sync()
-                .expect("Not working");
-            println!("Table name is {}", table_creator.table_name);
-        } else {
+        if x.is_present("name") && x.is_present("region"){
+            let reg = tables::get_region(x.value_of("region").unwrap());
+            match reg {
+                Some(reg) => {
+                    tables::table_create_reg_name(reg, x.value_of("name").unwrap());
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
+            }
+        } else if x.is_present("name"){
+            tables::table_create_reg_name(Region::UsWest2, x.value_of("name").unwrap())
+        } else if x.is_present("region"){
+            let reg = tables::get_region(x.value_of("region").unwrap());
+            match reg {
+                Some(reg) => {
+                    tables::table_create_reg_name(reg, "ironclad-store");
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
+            }
+        } else{
             tables::table_create_default();
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {

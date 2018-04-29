@@ -120,7 +120,7 @@ pub mod tables {
         }
     }
 
-    pub fn table_create_default() {
+    pub fn table_create_default() -> () {
         let client = DynamoDbClient::simple(Region::UsWest2);
         let mut table_creator = CreateTableInput::default();
         let read_capacity = 1;
@@ -134,6 +134,25 @@ pub mod tables {
             .create_table(&table_creator)
             .sync()
             .expect("Create default table failed.");
+        println!("Table name is {}", table_creator.table_name);
+    }
+
+    pub fn table_create_reg_name(reg: Region, name: &str) -> () {
+        let client = DynamoDbClient::simple(reg);
+        let tname = name.to_string();
+        let mut table_creator = CreateTableInput::default();
+        println!("Creating table {}", tname);
+        let read_capacity = 1;
+        let write_capacity = 1;
+        table_creator.table_name = tname;
+        table_creator.provisioned_throughput.read_capacity_units = read_capacity;
+        table_creator.provisioned_throughput.write_capacity_units = write_capacity;
+        table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
+        table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+        client
+            .create_table(&table_creator)
+            .sync()
+            .expect("Failed to create table.");
         println!("Table name is {}", table_creator.table_name);
     }
 }
