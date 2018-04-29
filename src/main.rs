@@ -324,10 +324,6 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
-        println!(
-            "Attempting to delete table: {:?}",
-            x.value_of("tableName").unwrap()
-        );
         let mut table_deleter = DeleteTableInput::default();
         let mut new_delete_table = x.value_of("tableName").unwrap();
         table_deleter.table_name = new_delete_table.to_string();
