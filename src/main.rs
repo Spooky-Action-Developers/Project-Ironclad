@@ -255,7 +255,7 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
-        if x.is_present("name") && x.is_present("region"){
+        if x.is_present("name") && x.is_present("region") {
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
                 Some(reg) => {
@@ -271,9 +271,9 @@ fn main() {
                     }
                 }
             }
-        } else if x.is_present("name"){
+        } else if x.is_present("name") {
             tables::table_create_reg_name(Region::UsWest2, x.value_of("name").unwrap())
-        } else if x.is_present("region"){
+        } else if x.is_present("region") {
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
                 Some(reg) => {
@@ -289,7 +289,7 @@ fn main() {
                     }
                 }
             }
-        } else{
+        } else {
             tables::table_create_default();
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {

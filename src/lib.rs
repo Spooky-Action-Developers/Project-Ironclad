@@ -5,7 +5,7 @@ extern crate rusoto_dynamodb;
 pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::*;
-    use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ListTablesInput, CreateTableInput};
+    use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput};
 
     #[macro_export]
     macro_rules! attributes {
