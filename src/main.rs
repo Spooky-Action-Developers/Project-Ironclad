@@ -6,13 +6,9 @@ extern crate rusoto_dynamodb;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
-use iron_lib::*;
 use rusoto_core::region::Region;
-use rusoto_dynamodb::*;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
 
 fn main() {
-    let client = DynamoDbClient::simple(Region::UsWest2);
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
     let regions = vec![
@@ -166,6 +162,13 @@ fn main() {
                     .arg(Arg::with_name("tableName")
                          .help("Table to be deleted.")
                          .required(true))
+                    .arg(Arg::with_name("region")
+                         .short("r")
+                         .long("region")
+                         .help("Region of table to be deleted.")
+                         .required(false)
+                         .takes_value(true)
+                         .value_name("REGION"))
                     )
         //Required subcommand
         .setting(AppSettings::SubcommandRequired)
