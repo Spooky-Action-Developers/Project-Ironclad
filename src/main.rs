@@ -106,11 +106,20 @@ fn main() {
                     .arg(Arg::with_name("name")
                          .short("n")
                          .long("name")
-                         .help("indicates name of table to be setup with default values")
+                         .help("Indicates name of table to be setup.")
                          .required(false)
                          .takes_value(true)
                          .value_name("NAME")
-                         ))
+                         )
+                    .arg(Arg::with_name("region")
+                         .short("r")
+                         .long("region")
+                         .help("Indicates region in which to create table.")
+                         .required(false)
+                         .takes_value(true)
+                         .value_name("REGION")
+                         )
+                    )
         //Subcommand information/flags for `view` subcommand
         //Lists the identifiers of secrets in table
         .subcommand(SubCommand::with_name("view")
@@ -188,7 +197,7 @@ fn main() {
                 }
             }
         } else {
-            tables::list_tables_default(); //region flag not set, list default table: uswest2
+            tables::list_tables_default(); //region flag not set, list default region
         }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
@@ -246,41 +255,42 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
-        if x.is_present("name") {
-            println!(
-                "I'd be attempting to create table with name: {:?}",
-                x.value_of("name").unwrap()
-            );
-            let new_table_name = x.value_of("name").unwrap();
-            let mut table_creator = CreateTableInput::default();
-            println!("Creating table {} ", new_table_name);
-            let mut read_capacity = 1;
-            let mut write_capacity = 1;
-            table_creator.table_name = new_table_name.to_string();
-            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
-            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
-            client
-                .create_table(&table_creator)
-                .sync()
-                .expect("Not working");
-            println!("Table name is {}", table_creator.table_name);
+        if x.is_present("name") && x.is_present("region") {
+            let reg = tables::get_region(x.value_of("region").unwrap());
+            match reg {
+                Some(reg) => {
+                    tables::table_create_reg_name(reg, x.value_of("name").unwrap());
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
+            }
+        } else if x.is_present("name") {
+            tables::table_create_reg_name(Region::UsWest2, x.value_of("name").unwrap())
+        } else if x.is_present("region") {
+            let reg = tables::get_region(x.value_of("region").unwrap());
+            match reg {
+                Some(reg) => {
+                    tables::table_create_reg_name(reg, "ironclad-store");
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
+            }
         } else {
-            println!("I'd be attempting to create default table \"ironclad-store\"");
-            let mut table_creator = CreateTableInput::default();
-            let mut read_capacity = 1;
-            let mut write_capacity = 1;
-            table_creator.table_name = "Ironclad-store".to_string();
-            table_creator.provisioned_throughput.read_capacity_units = read_capacity;
-            table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-            table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-            table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
-            client
-                .create_table(&table_creator)
-                .sync()
-                .expect("Create default table failed.");
-            println!("Table name is {}", table_creator.table_name);
+            tables::table_create_default();
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {

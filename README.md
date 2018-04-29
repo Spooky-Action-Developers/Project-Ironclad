@@ -162,7 +162,8 @@ FLAGS:
     -h, --help       Prints help information
 
 OPTIONS:
-    -n, --name <NAME>    indicates name of table to be setup with default values
+    -n, --name <NAME>        Indicates name of table to be setup with default values
+    -r, --region <REGION>    Indicates region in which to create table.
 
 ------------------------------------------------------------------------
 
