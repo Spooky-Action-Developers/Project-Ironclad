@@ -155,6 +155,30 @@ pub mod tables {
             .expect("Failed to create table.");
         println!("Table name is {}", table_creator.table_name);
     }
+
+    pub fn table_deleter(name: &str) -> () {
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let mut table_deleter = DeleteTableInput::default();
+        let new_delete_table = name.to_string();
+        table_deleter.table_name = new_delete_table;
+        client
+            .delete_table(&table_deleter)
+            .sync()
+            .expect("Delete Table Failed");
+        println!("Successfully deleted: {:?}", table_deleter.table_name);
+    }
+
+    pub fn table_deleter_reg(reg: Region, name: &str) -> () {
+        let client = DynamoDbClient::simple(reg);
+        let mut table_deleter = DeleteTableInput::default();
+        let new_delete_table = name.to_string();
+        table_deleter.table_name = new_delete_table;
+        client
+            .delete_table(&table_deleter)
+            .sync()
+            .expect("Delete Table Failed");
+        println!("Successfully deleted: {:?}", table_deleter.table_name);
+    }
 }
 
 #[cfg(test)]
