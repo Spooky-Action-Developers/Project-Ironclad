@@ -190,6 +190,9 @@ FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
 
+OPTIONS:
+    -r, --region <REGION>   Region of table to be deleted.
+
 ARGS:
     <tableName>    Table to be deleted.
 

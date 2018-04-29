@@ -6,13 +6,9 @@ extern crate rusoto_dynamodb;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
-use iron_lib::*;
 use rusoto_core::region::Region;
-use rusoto_dynamodb::*;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient};
 
 fn main() {
-    let client = DynamoDbClient::simple(Region::UsWest2);
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
     let regions = vec![
@@ -166,6 +162,13 @@ fn main() {
                     .arg(Arg::with_name("tableName")
                          .help("Table to be deleted.")
                          .required(true))
+                    .arg(Arg::with_name("region")
+                         .short("r")
+                         .long("region")
+                         .help("Region of table to be deleted.")
+                         .required(false)
+                         .takes_value(true)
+                         .value_name("REGION"))
                     )
         //Required subcommand
         .setting(AppSettings::SubcommandRequired)
@@ -324,17 +327,27 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
-        println!(
-            "Attempting to delete table: {:?}",
-            x.value_of("tableName").unwrap()
-        );
-        let mut table_deleter = DeleteTableInput::default();
-        let mut new_delete_table = x.value_of("tableName").unwrap();
-        table_deleter.table_name = new_delete_table.to_string();
-        client
-            .delete_table(&table_deleter)
-            .sync()
-            .expect("Delete Table Failed.");
-        println!("Successfully deleted {:?}", new_delete_table);
+        if x.is_present("region") {
+            let reg = tables::get_region(x.value_of("region").unwrap());
+            match reg {
+                Some(reg) => {
+                    let mut delete_table_name = x.value_of("tableName").unwrap();
+                    tables::table_deleter_reg(reg,delete_table_name);
+                } //if region correctly parsed, list tables in region
+                None => {
+                    //else: display error informing what values can be used
+                    eprintln!("Error: Region not correctly specified...\n");
+                    let mut reg_list_string = "";
+                    eprintln!("Must be in list:{}", reg_list_string);
+                    for region in regions {
+                        println!("{}", region);
+                    }
+                }
+            }
+        }
+        else {
+            let mut delete_table_name = x.value_of("tableName").unwrap();
+            tables::table_deleter(delete_table_name);
+        }
     }
 }
