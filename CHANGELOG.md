@@ -29,7 +29,7 @@ ____________________________________________________________________________
   - Migrated to Mozilla Public License
   - Lint checks added to Travis CI Test
 ### Removed
-  - Hash
+  - Initial hash table storing cryptographic hashes from version 0.1.0
 
 ## 0.1.0 - 2018-03-20 - [YANKED]
 ____________________________________________________________________________

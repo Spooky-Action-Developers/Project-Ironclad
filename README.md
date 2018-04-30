@@ -198,13 +198,13 @@ ARGS:
 
 ```
 
-## License
-
-Project Ironclad is distributed under the terms of the Mozilla Public License.
-See [License](LICENSE) for details.
-
 ## Documentation
 
 Documentation of the project and its releases, will be using the standard of semantic versioning. For more information on this release archetype, see [here](https://semver.org/).
 
 The changes made to the system in the form of major and minor releases can be found in the [Project Ironclad Changelog](CHANGELOG.md).
+
+## License
+
+Project Ironclad is distributed under the terms of the Mozilla Public License.
+See [License](LICENSE) for details.
