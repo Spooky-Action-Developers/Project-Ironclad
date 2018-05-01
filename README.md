@@ -180,7 +180,7 @@ OPTIONS:
     -t, --table <TABLE>    Indicates a table to view other than default.
 
 -------------------------------------------------------------------------
-delete-table 
+delete-table
 Delete specified table from AWS.
 
 USAGE:
@@ -197,6 +197,12 @@ ARGS:
     <tableName>    Table to be deleted.
 
 ```
+
+## Documentation
+
+Documentation of the project and its releases, will be using the standard of semantic versioning. For more information on this release archetype, see [here](https://semver.org/).
+
+The changes made to the system in the form of major and minor releases can be found in the [Project Ironclad Changelog](CHANGELOG.md).
 
 ## License
 
