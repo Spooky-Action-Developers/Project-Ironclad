@@ -6,6 +6,7 @@ pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::*;
     use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput};
+    use std::collections::HashMap;
 
     #[macro_export]
     macro_rules! attributes {
@@ -147,8 +148,10 @@ pub mod tables {
         table_creator.table_name = tname;
         table_creator.provisioned_throughput.read_capacity_units = read_capacity;
         table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-        table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+        table_creator.key_schema = key_schema!("secret_name" => "HASH", "secret_number" => "RANGE",
+                                                "secret" => "RANGE");
+        table_creator.attribute_definitions = attributes!("secret_name" => "S", "secret_number" => "N",
+                                                          "secret" => "R");
         client
             .create_table(&table_creator)
             .sync()
@@ -178,6 +181,22 @@ pub mod tables {
             .sync()
             .expect("Delete Table Failed");
         println!("Successfully deleted: {:?}", table_deleter.table_name);
+    }
+
+    pub fn delete_item(table_name: &str, secret_name: &str, secret_number: &str) -> () {
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let mut delete_item_ = DeleteItemInput::default();
+        let mut map_delete = HashMap::new();
+        let attribute = "secret_name".to_string();
+        let attribute_number = "secret_number".to_string();
+        map_delete.insert(attribute, val!(S => &secret_name));
+        map_delete.insert(attribute_number, val!(N =>  &secret_number));
+        delete_item_.table_name = table_name.to_string();
+        delete_item_.key = map_delete;
+        client
+            .delete_item(&delete_item_)
+            .sync()
+            .expect("Delete Item not working");
     }
 }
 
