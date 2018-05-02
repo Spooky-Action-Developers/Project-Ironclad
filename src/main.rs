@@ -267,6 +267,10 @@ fn main() {
                 x.value_of("identifier").unwrap(),
                 x.value_of("ID").unwrap()
             );
+            tables::delete_item("ironclad-store",
+            x.value_of("identifier").unwrap(),
+            x.value_of("ID").unwrap()
+            );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
         if x.is_present("name") && x.is_present("region") {
