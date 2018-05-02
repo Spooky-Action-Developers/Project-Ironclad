@@ -93,8 +93,12 @@ fn main() {
                          )
                     .arg(Arg::with_name("identifier")
                          .required(true)
-                         .help("Name of secreet to be deleted from DynamoDB Table.")
-                         ))
+                         .help("Name of secret to be deleted from DynamoDB Table.")
+                         )
+                     .arg(Arg::with_name("ID")
+                        .required(true)
+                        .help("Number of secret to be deleted from DynamoDB Table")
+                        ))
         //Subcommand information/flags for `setup` subcommand
         //creates table
         .subcommand(SubCommand::with_name("setup")
@@ -245,16 +249,23 @@ fn main() {
             }
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete") {
-        if x.is_present("tableName") {
+        if x.is_present("tableName") && x.is_present("identifier") && x.is_present("ID") {
             println!(
-                "I'd be attempting to delete {:?} from table {:?}.",
+                "I'd be attempting to delete {:?}, ID number {:?} from table {:?}.",
                 x.value_of("identifier").unwrap(),
+                x.value_of("ID").unwrap(),
                 x.value_of("tableName").unwrap()
             );
+            tables::delete_item(
+                x.value_of("tableName").unwrap(),
+                x.value_of("identifier").unwrap(),
+                x.value_of("ID").unwrap(),
+            )
         } else {
             println!(
-                "I'd be attempting to delete {:?} from default table.",
-                x.value_of("identifier").unwrap()
+                "I'd be attempting to delete {:?} {:?} from default table.",
+                x.value_of("identifier").unwrap(),
+                x.value_of("ID").unwrap()
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
@@ -332,7 +343,7 @@ fn main() {
             match reg {
                 Some(reg) => {
                     let mut delete_table_name = x.value_of("tableName").unwrap();
-                    tables::table_deleter_reg(reg,delete_table_name);
+                    tables::table_deleter_reg(reg, delete_table_name);
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -344,8 +355,7 @@ fn main() {
                     }
                 }
             }
-        }
-        else {
+        } else {
             let mut delete_table_name = x.value_of("tableName").unwrap();
             tables::table_deleter(delete_table_name);
         }
