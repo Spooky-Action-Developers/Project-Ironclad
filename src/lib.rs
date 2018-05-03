@@ -129,8 +129,8 @@ pub mod tables {
         table_creator.table_name = "ironclad-store".to_string();
         table_creator.provisioned_throughput.read_capacity_units = read_capacity;
         table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("string" => "HASH", "number" => "RANGE");
-        table_creator.attribute_definitions = attributes!("string" => "S", "number" => "N");
+        table_creator.key_schema = key_schema!("name" => "HASH", "version" => "RANGE");
+        table_creator.attribute_definitions = attributes!("name" => "S", "version" => "N");
         client
             .create_table(&table_creator)
             .sync()
@@ -148,10 +148,8 @@ pub mod tables {
         table_creator.table_name = tname;
         table_creator.provisioned_throughput.read_capacity_units = read_capacity;
         table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("secret_name" => "HASH", "secret_number" => "RANGE",
-                                                "secret" => "RANGE");
-        table_creator.attribute_definitions = attributes!("secret_name" => "S", "secret_number" => "N",
-                                                          "secret" => "R");
+        table_creator.key_schema = key_schema!("name" => "HASH", "version" => "RANGE"); 
+        table_creator.attribute_definitions = attributes!("name" => "S", "version" => "N");
         client
             .create_table(&table_creator)
             .sync()
@@ -187,8 +185,8 @@ pub mod tables {
         let client = DynamoDbClient::simple(Region::UsWest2);
         let mut delete_item_ = DeleteItemInput::default();
         let mut map_delete = HashMap::new();
-        let attribute = "secret_name".to_string();
-        let attribute_number = "secret_number".to_string();
+        let attribute = "name".to_string();
+        let attribute_number = "version".to_string();
         map_delete.insert(attribute, val!(S => &secret_name));
         map_delete.insert(attribute_number, val!(N =>  &secret_number));
         delete_item_.table_name = table_name.to_string();
@@ -203,8 +201,8 @@ pub mod tables {
         let client = DynamoDbClient::simple(Region::UsWest2);
         let mut put_item_creator = PutItemInput::default();
         let mut map= HashMap::new();
-        let attribute = "secret_name".to_string();
-        let attribute_number = "secret_number".to_string();
+        let attribute = "name".to_string();
+        let attribute_number = "version".to_string();
         map.insert(attribute, val!(S => &secret_name));
         map.insert(attribute_number, val!(N =>  &secret_number));
         put_item_creator.table_name = table_name.to_string();
