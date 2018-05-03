@@ -213,27 +213,3 @@ pub mod tables {
             .expect("Item push not working");
     }
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn t_authenticate_user() {
-        // Set AWS Variables to NULL values originally
-
-        // Run Authenticate User method
-
-        // Assert equality of AWS environment
-        // vars with their expected values
-        assert_eq!(1, 1);
-    }
-
-    #[test]
-    fn t_list_tables() {
-        println!("Function Output:\n");
-        tables::list_tables_default();
-        println!("\n\nExpected output:\n");
-        println!("Tables in database:\ncredential-store");
-    }
-}
