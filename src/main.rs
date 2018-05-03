@@ -231,17 +231,25 @@ fn main() {
                 }
             } else if x.is_present("table") {
                 println!(
-                    "Attmepting to store {:?} with name {:?} in table: {:?}",
-                    x.value_of("secret").unwrap(),
+                    "Attmepting to store secret {:?} with secret number {:?} in table: {:?}",
                     x.value_of("identifier").unwrap(),
+                    x.value_of("secret").unwrap(),
                     x.value_of("table").unwrap()
+                );
+                tables::put_item(x.value_of("table").unwrap(),
+                                 x.value_of("identifier").unwrap(),
+                                 x.value_of("secret").unwrap()
                 );
             } else {
                 if x.is_present("secret") {
                     println!(
                         "Attempting to store {:?} with name {:?} in default table",
-                        x.value_of("secret").unwrap(),
-                        x.value_of("identifier").unwrap()
+                        x.value_of("identifier").unwrap(),
+                        x.value_of("secret").unwrap()
+                    );
+                    tables::put_item("ironclad-store",
+                                    x.value_of("identifier").unwrap(),
+                                    x.value_of("secret").unwrap()
                     );
                 } else {
                     eprintln!("ERROR: Missing required argument: 'secret' for storage.");

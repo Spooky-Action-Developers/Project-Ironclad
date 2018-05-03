@@ -198,6 +198,19 @@ pub mod tables {
             .sync()
             .expect("Delete Item not working");
     }
+
+    pub fn put_item(table_name: &str, secret_name: &str, secret_number: &str) -> () {
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let mut put_item_creator = PutItemInput::default();
+        let mut map= HashMap::new();
+        let attribute = "secret_name".to_string();
+        let attribute_number = "secret_number".to_string();
+        map.insert(attribute, val!(S => &secret_name));
+        map.insert(attribute_number, val!(N =>  &secret_number));
+        put_item_creator.table_name = table_name.to_string();
+        put_item_creator.item = map;
+        client.put_item(&put_item_creator).sync().expect("Item push not working");
+    }
 }
 
 #[cfg(test)]
