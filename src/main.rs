@@ -174,14 +174,6 @@ fn main() {
                          .takes_value(true)
                          .value_name("REGION"))
                     )
-        //Subcommand information/flags for `switch-profile` command
-        //Switches AWS_PROFILE to the desired profile found in .aws/credentials
-        .subcommand(SubCommand::with_name("switch-profile")
-                    .about("Switches to specified AWS Profile")
-                    .arg(Arg::with_name("profile")
-                         .help("Name of profile to switch to.")
-                         .required(true))
-                    )
         //Required subcommand
         .setting(AppSettings::SubcommandRequired)
         .get_matches();

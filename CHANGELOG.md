@@ -2,6 +2,16 @@
 
 All notable changes to the project will be documented here.
 
+## 0.3.1 - 2018-05-03
+____________________________________________________________________________
+
+### Added
+  - 
+### Changed
+  - README to reflect switch profile usage
+### Removed
+  - Switch-profile subcommand (supplanted with ability to change profile at command line through AWS_PROFILE var)
+
 ## 0.3.0 - 2018-05-03
 ____________________________________________________________________________
 
