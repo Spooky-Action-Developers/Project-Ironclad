@@ -2,7 +2,20 @@
 
 All notable changes to the project will be documented here.
 
-## 0.2.1 - 2018-05-17
+## 0.3.0 - 2018-05-03
+____________________________________________________________________________
+
+### Added
+  - Put Item/Delete Item Functions
+  - Put basic ```switch-profile``` command in parser/main functionality
+### Changed
+  - Create Table (Redefined attribute/key schema values)
+  - Delete Item subcommand was modified for new key schema in main function
+### Removed
+  - Unused testing mod (external testing has been implemented)
+	- Should be noted that we intend to utilize internal testing when we learn to test against stdout outputs of application
+
+## 0.2.1 - 2018-04-17
 ____________________________________________________________________________
 
 ### Added
