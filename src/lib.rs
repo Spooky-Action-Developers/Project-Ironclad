@@ -5,7 +5,7 @@ extern crate rusoto_dynamodb;
 pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::*;
-    use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput};
+    use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput, ScanInput};
     use std::collections::HashMap;
 
     #[macro_export]
@@ -211,5 +211,30 @@ pub mod tables {
             .put_item(&put_item_creator)
             .sync()
             .expect("Item push not working");
+    }
+
+    pub fn list_items(table_name: &str) -> () {
+        let client = DynamoDbClient::simple(Region::UsWest2);
+        let mut scan_table_input = ScanInput::default();
+        scan_table_input.table_name = table_name.to_string();
+        let scan_output = client.scan(&scan_table_input).sync().expect("Scan Failed");
+        println!("There are {:?} items in {:?}\n",scan_output.count.unwrap(), scan_table_input.table_name);
+        match scan_output.items {
+            Some(vector) => {
+                let mut count = 1;
+                for secrets in vector {
+                    let mut secret = secrets.get("name").unwrap().clone();
+                    let secret_name = &*secret.s.unwrap();
+
+                    let mut versions = secrets.get("version").unwrap().clone();
+                    let version = versions.n.unwrap();
+                    println!("Secret {}:\nName: {:?}\nVersion: {:?}", count,secret_name,version);
+                    count = count + 1;
+                }
+            }
+            None => {
+                ;
+            }
+        }
     }
 }

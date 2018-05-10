@@ -323,12 +323,9 @@ fn main() {
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {
-            println!(
-                "I'd be attempting to list the secrets in the table specified: {:?}",
-                x.value_of("table").unwrap()
-            );
+            tables::list_items(x.value_of("table").unwrap());
         } else {
-            println!("I'd be attemtping to list the secrets in the default table.");
+            tables::list_items("ironclad-store");
         }
     } else if let Some(x) = app_matches.subcommand_matches("getall") {
         if x.is_present("table") {
