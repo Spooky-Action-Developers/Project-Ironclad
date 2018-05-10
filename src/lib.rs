@@ -218,7 +218,11 @@ pub mod tables {
         let mut scan_table_input = ScanInput::default();
         scan_table_input.table_name = table_name.to_string();
         let scan_output = client.scan(&scan_table_input).sync().expect("Scan Failed");
-        println!("There are {:?} items in {:?}\n",scan_output.count.unwrap(), scan_table_input.table_name);
+        println!(
+            "There are {:?} items in {:?}\n",
+            scan_output.count.unwrap(),
+            scan_table_input.table_name
+        );
         match scan_output.items {
             Some(vector) => {
                 let mut count = 1;
@@ -228,13 +232,14 @@ pub mod tables {
 
                     let mut versions = secrets.get("version").unwrap().clone();
                     let version = versions.n.unwrap();
-                    println!("Secret {}:\nName: {:?}\nVersion: {:?}", count,secret_name,version);
+                    println!(
+                        "Secret {}:\nName: {:?}\nVersion: {:?}",
+                        count, secret_name, version
+                    );
                     count = count + 1;
                 }
             }
-            None => {
-                ;
-            }
+            None => {}
         }
     }
 }
