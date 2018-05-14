@@ -61,7 +61,7 @@ fn main() {
                     )
                     .arg(Arg::with_name("secret")
                          .help("String to be stored at command line")
-                         //.required_unless("fileName")
+                         .required_unless("fileName")
                          )
                     .about("Store a credential through AWS.")
                     .arg(Arg::with_name("fileName")
@@ -78,6 +78,14 @@ fn main() {
                          .value_name("TABLE")
                          .required(false)
                          .help("Specify which table to store secret credential in.")
+                         )
+                    .arg(Arg::with_name("version")
+                         .short("v")
+                         .long("version")
+                         .takes_value(true)
+                         .value_name("VERSION NUM")
+                         .required(false)
+                         .help("Specify the version associated with this secret.")
                          ))
         //Subcommand information/flags for `delete` subcommand
         //deletes credential from table
@@ -208,53 +216,70 @@ fn main() {
         }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
-            if x.is_present("fileName") && x.is_present("table") {
+            if x.is_present("fileName") {
                 if x.is_present("secret") {
                     eprintln!("ERROR: Too many arguments for storage.");
                 } else {
+                    if x.is_present("version") && x.is_present("table") {
+                        println!(
+                            "Storing file: {:?} with identifier {:?} in table: {:?}",
+                            x.value_of("fileName").unwrap(),
+                            x.value_of("identifier").unwrap(),
+                            x.value_of("table").unwrap()
+                        );
+                    } else if x.is_present("version") {
+                        println!(
+                            "Storing file: {:?} version {} with identifier {:?} in default table",
+                            x.value_of("filename").unwrap(),
+                            x.value_of("version").unwrap(),
+                            x.value_of("identifier").unwrap()
+                        );
+                    } else if x.is_present("table") {
+                        println!(
+                            "Storing file: {:?} with identifer {:?} in table: {:?}",
+                            x.value_of("filename").unwrap(),
+                            x.value_of("idenitifier").unwrap(),
+                            x.value_of("table").unwrap()
+                        );
+                    }
+                }
+            } else if x.is_present("table") {
+                if x.is_present("version") {
                     println!(
-                        "Storing file: {:?} with identifier {:?} in table: {:?}",
-                        x.value_of("fileName").unwrap(),
+                        "Storing secret {:?} version {} in table: {:?}",
+                        x.value_of("identifier").unwrap(),
+                        x.value_of("version").unwrap(),
+                        x.value_of("table").unwrap()
+                    );
+                } else {
+                    println!(
+                        "Storing secret {:?} in table: {:?}",
                         x.value_of("identifier").unwrap(),
                         x.value_of("table").unwrap()
                     );
-                }
-            } else if x.is_present("fileName") {
-                if x.is_present("secret") {
-                    eprintln!("ERROR: Too many arguments for storage.");
-                } else {
-                    println!(
-                        "Storing file: {:?} with identifier {:?} in default table.",
-                        x.value_of("fileName").unwrap(),
-                        x.value_of("identifier").unwrap()
+                    tables::put_item(
+                        x.value_of("table").unwrap(),
+                        x.value_of("identifier").unwrap(),
+                        x.value_of("secret").unwrap(),
                     );
                 }
-            } else if x.is_present("table") {
-                println!(
-                    "Storing secret {:?} with secret number {:?} in table: {:?}",
-                    x.value_of("identifier").unwrap(),
-                    x.value_of("secret").unwrap(),
-                    x.value_of("table").unwrap()
-                );
-                tables::put_item(
-                    x.value_of("table").unwrap(),
-                    x.value_of("identifier").unwrap(),
-                    x.value_of("secret").unwrap(),
-                );
             } else {
-                if x.is_present("secret") {
+                if x.is_present("version") {
                     println!(
-                        "Storing {:?} with name {:?} in default table",
+                        "Storing {:?} version {} in default table",
                         x.value_of("identifier").unwrap(),
-                        x.value_of("secret").unwrap()
+                        x.value_of("version").unwrap()
+                    );
+                } else {
+                    println!(
+                        "Storing {:?} in default table",
+                        x.value_of("identifier").unwrap(),
                     );
                     tables::put_item(
                         "ironclad-store",
                         x.value_of("identifier").unwrap(),
                         x.value_of("secret").unwrap(),
                     );
-                } else {
-                    eprintln!("ERROR: Missing required argument: 'secret' for storage.");
                 }
             }
         }
