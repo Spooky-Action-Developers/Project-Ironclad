@@ -145,6 +145,8 @@ FLAGS:
 OPTIONS:
     -f, --file <FILE>      Path to the file to be stored.
     -t, --table <TABLE>    Specify which table to store secret credential in.
+    -v, --version <VERSION> Specify the version associated with this secret.
+			    If version already exists, it will be overwritten on DynamoDB.
 
 ARGS:
     <identifier>    Identifier with which to store the credential in AWS.

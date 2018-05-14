@@ -129,8 +129,8 @@ pub mod tables {
         table_creator.table_name = "ironclad-store".to_string();
         table_creator.provisioned_throughput.read_capacity_units = read_capacity;
         table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("name" => "HASH", "version" => "RANGE");
-        table_creator.attribute_definitions = attributes!("name" => "S", "version" => "N");
+        table_creator.key_schema = key_schema!("name" => "HASH","version" => "RANGE");
+        table_creator.attribute_definitions = attributes!("name" => "S","version" => "N");
         client
             .create_table(&table_creator)
             .sync()
@@ -148,8 +148,8 @@ pub mod tables {
         table_creator.table_name = tname;
         table_creator.provisioned_throughput.read_capacity_units = read_capacity;
         table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("name" => "HASH", "version" => "RANGE");
-        table_creator.attribute_definitions = attributes!("name" => "S", "version" => "N");
+        table_creator.key_schema = key_schema!("name" => "HASH","version" => "RANGE");
+        table_creator.attribute_definitions = attributes!("name" => "S","version" => "N");
         client
             .create_table(&table_creator)
             .sync()
@@ -197,20 +197,30 @@ pub mod tables {
             .expect("Delete Item not working");
     }
 
-    pub fn put_item(table_name: &str, secret_name: &str, secret_number: &str) -> () {
-        let client = DynamoDbClient::simple(Region::UsWest2);
-        let mut put_item_creator = PutItemInput::default();
-        let mut map = HashMap::new();
-        let attribute = "name".to_string();
-        let attribute_number = "version".to_string();
-        map.insert(attribute, val!(S => &secret_name));
-        map.insert(attribute_number, val!(N =>  &secret_number));
-        put_item_creator.table_name = table_name.to_string();
-        put_item_creator.item = map;
-        client
-            .put_item(&put_item_creator)
-            .sync()
-            .expect("Item push not working");
+    pub fn put_item(table_name: &str, secret_name: &str, secret: &str, version_number: &str) -> () {
+        match version_number.parse::<i32>() {
+            Ok(version_num) => {
+                println!("Here");
+                let client = DynamoDbClient::simple(Region::UsWest2);
+                let mut put_item_creator = PutItemInput::default();
+                let mut map = HashMap::new();
+                let attribute_name = "name".to_string();
+                let attribute_secret = "secret".to_string();
+                let attribute_number = "version".to_string();
+                map.insert(attribute_name, val!(S => &secret_name));
+                map.insert(attribute_secret, val!(S => &secret));
+                map.insert(attribute_number, val!(N =>  &version_num));
+                put_item_creator.table_name = table_name.to_string();
+                put_item_creator.item = map;
+                client
+                    .put_item(&put_item_creator)
+                    .sync()
+                    .expect("Item push not working");
+            }
+            Err(_e) => {
+                eprintln!("Incorrectly specified version number.");
+            }
+        }
     }
 
     pub fn list_items(table_name: &str) -> () {
