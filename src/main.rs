@@ -213,7 +213,7 @@ fn main() {
                     eprintln!("ERROR: Too many arguments for storage.");
                 } else {
                     println!(
-                        "Attempting to store file: {:?} with identifier {:?} in table: {:?}",
+                        "Storing file: {:?} with identifier {:?} in table: {:?}",
                         x.value_of("fileName").unwrap(),
                         x.value_of("identifier").unwrap(),
                         x.value_of("table").unwrap()
@@ -224,14 +224,14 @@ fn main() {
                     eprintln!("ERROR: Too many arguments for storage.");
                 } else {
                     println!(
-                        "Attempting to store file: {:?} with identifier {:?} in default table.",
+                        "Storing file: {:?} with identifier {:?} in default table.",
                         x.value_of("fileName").unwrap(),
                         x.value_of("identifier").unwrap()
                     );
                 }
             } else if x.is_present("table") {
                 println!(
-                    "Attmepting to store secret {:?} with secret number {:?} in table: {:?}",
+                    "Storing secret {:?} with secret number {:?} in table: {:?}",
                     x.value_of("identifier").unwrap(),
                     x.value_of("secret").unwrap(),
                     x.value_of("table").unwrap()
@@ -244,7 +244,7 @@ fn main() {
             } else {
                 if x.is_present("secret") {
                     println!(
-                        "Attempting to store {:?} with name {:?} in default table",
+                        "Storing {:?} with name {:?} in default table",
                         x.value_of("identifier").unwrap(),
                         x.value_of("secret").unwrap()
                     );
