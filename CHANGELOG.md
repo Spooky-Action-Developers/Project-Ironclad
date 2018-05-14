@@ -2,6 +2,18 @@
 
 All notable changes to the project will be documented here.
 
+## 0.3.2 - 2018-05-14
+____________________________________________________________________________
+
+## Added
+  - New ```put``` functionality to store with a 
+  - Added KMS to encrypt and decrypt secrets on ```put``` and ```get```
+## Changed
+  - Main functionality updated for put subcommand to take secret values
+  - Updated ```put_item``` function to add secret attribute and store it to AWS
+##Removed
+  - Refactored main code to remove redundant conditionals, increasing efficiency of checks
+
 ## 0.3.1 - 2018-05-03
 ____________________________________________________________________________
 
