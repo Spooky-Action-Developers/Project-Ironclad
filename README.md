@@ -16,12 +16,26 @@ git clone https://github.com/Spooky-Action-Developers/Project-Ironclad.git
 cargo build
 cargo run
 ```
+### Linux Installation Dependencies
+
+Project Ironclad is reliant upon the rusoto AWS SDK. In order to utilize all features necessary, OpenSSL or equivalent is required.
+For Linux users, there exists libssl as an alternative.
+
+For Debian and Ubuntu, the following command with ensure the system is able to be installed:
+
+```
+$ sudo apt-get install build-essential libssl-dev 
+```
+
+Upon installation of dependencies, the system can be installed and utilized as intended.
 
 ## Description
 
 Project Ironclad is a command line utility to effectively create, store and retrieve secrets (or credentials) through Amazon Web Services (AWS). The program utilizes the Rust programming language. In particular, it uses the Rust-Nightly branch of the Rust Language project and is built on top of Rusoto, a AWS SDK that utilizes the AWS API.
 
-## Working With Multiple AWS Accounts (profiles)
+##Setup
+
+### Working With Multiple AWS Accounts (profiles)
 
 If you are working with multiple AWS accounts, you can set multiple profiles in the ```~/.aws/credentials```
 file. For example:
@@ -32,12 +46,31 @@ aws_access_key_id = KIDTOYEXAMPLEASDAFAD
 aws_secret_access_key = TOYEXAMPLE12341231
 
 [switch]
-aws_secret_key_id = KIDTOYEXAMPLEASDAFAD
+aws_access_key_id = KIDTOYEXAMPLEASDAFAD
 aws_secret_access_key = TOYEXAMPLE12341231
 ```
 
 Then, by setting the ```AWS_PROFILE``` environment variable (i.e. ```export AWS_PROFILE=switch```) you can point ironclad
 at the appropriate account to use for validation.
+
+### Changing Default Region
+
+In order to decide the default region associated with Project Ironclad, you can set it via the command (i.e. ```export AWS_DEFAULT_REGION=region_name```).
+Alternatively, most commands take the -r flag to utilize a specific region if desired. If the region is not set via one of the previous methods, Project Ironcald with utilize us-east-1.
+
+### Setting up KMS
+
+```ironclad``` will not currently set up your KMS master key. To create a KMS master key,
+
+1. Go to AWS console
+2. Got to the IAM console/tab
+3. Click "Encryption Keys" on the left
+4. Click "Create Key". For the keys alias, put "ironclad"
+5. Decide what IAM pricipals you want to be able to manage the key
+6. On the "Key Usage Permissions" screen, pick the IAM users/roles that will be using Project Ironclad
+   (Note: These can be changed as needed)
+7. KMS setup complete
+8. Note: Repeat this process for each region you wish to utilize Project Ironclad in
 
 ## Usage
 

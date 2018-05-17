@@ -13,24 +13,24 @@ fn main() {
     /*Set of region that can be specified. This allows to check values for get_region() functions
      * as well as to validate expected inputs in error messages.*/
     let regions = vec![
-        "apnortheast1",
-        "apnortheast2",
-        "apsouth1",
-        "apsoutheast1",
-        "apsoutheast2",
-        "cacentral1",
-        "eucentral1",
-        "euwest1",
-        "euwest2",
-        "euwest3",
-        "saeast1",
-        "useast1",
-        "useast2",
-        "uswest1",
-        "uswest2",
-        "usgovwest1",
-        "cnnorth1",
-        "cnnorthwest1",
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-south-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ca-central-1",
+        "eu-central-1",
+        "eu-west-1",
+        "eu-west-2",
+        "eu-west-3",
+        "sa-east-1",
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+        "us-govwest-1",
+        "cn-north-1",
+        "cn-northwest-1",
     ];
 
     /*Start of program logic. This will be used to gather and parse passed arguments from the user.
@@ -200,7 +200,7 @@ fn main() {
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
                 Some(reg) => {
-                    tables::list_tables_region(reg);
+                    tables::list_tables(reg);
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -213,7 +213,7 @@ fn main() {
                 }
             }
         } else {
-            tables::list_tables_default(); //region flag not set, list default region
+            tables::list_tables(Region::default()); //region flag not set, list default region
         }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
@@ -256,7 +256,8 @@ fn main() {
                         x.value_of("table").unwrap(),
                         x.value_of("identifier").unwrap(),
                         x.value_of("secret").unwrap(),
-                        x.value_of("version").unwrap());
+                        x.value_of("version").unwrap(),
+                    );
                 } else {
                     println!(
                         "Storing secret {:?} in table: {:?}",
@@ -283,15 +284,17 @@ fn main() {
                         x.value_of("secret").unwrap(),
                         x.value_of("version").unwrap(),
                     );
-                }
-                else {
-                    println!("Storing {:?} in default table",x.value_of("identifier"));
+                } else {
+                    println!(
+                        "Storing {:?} in default table",
+                        x.value_of("identifier").unwrap()
+                    );
                     tables::put_item(
                         "ironclad-store",
                         x.value_of("identifier").unwrap(),
                         x.value_of("secret").unwrap(),
-                        "1"
-                        );
+                        "1",
+                    );
                 }
             }
         }
@@ -325,7 +328,7 @@ fn main() {
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
                 Some(reg) => {
-                    tables::table_create_reg_name(reg, x.value_of("name").unwrap());
+                    tables::table_creator(reg, x.value_of("name").unwrap());
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -338,12 +341,12 @@ fn main() {
                 }
             }
         } else if x.is_present("name") {
-            tables::table_create_reg_name(Region::UsWest2, x.value_of("name").unwrap())
+            tables::table_creator(Region::default(), x.value_of("name").unwrap())
         } else if x.is_present("region") {
             let reg = tables::get_region(x.value_of("region").unwrap());
             match reg {
                 Some(reg) => {
-                    tables::table_create_reg_name(reg, "ironclad-store");
+                    tables::table_creator(reg, "ironclad-store");
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -356,7 +359,7 @@ fn main() {
                 }
             }
         } else {
-            tables::table_create_default();
+            tables::table_creator(Region::default(), "ironclad-store");
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         if x.is_present("table") {
@@ -392,7 +395,7 @@ fn main() {
             match reg {
                 Some(reg) => {
                     let mut delete_table_name = x.value_of("tableName").unwrap();
-                    tables::table_deleter_reg(reg, delete_table_name);
+                    tables::table_deleter(reg, delete_table_name);
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -406,12 +409,7 @@ fn main() {
             }
         } else {
             let mut delete_table_name = x.value_of("tableName").unwrap();
-            tables::table_deleter(delete_table_name);
+            tables::table_deleter(Region::default(), delete_table_name);
         }
-    } else if let Some(x) = app_matches.subcommand_matches("switch-profile") {
-        println!(
-            "I'd be attempting to switch to profile: {:?}",
-            x.value_of("profile").unwrap()
-        );
     }
 }

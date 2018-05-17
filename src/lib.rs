@@ -3,14 +3,12 @@ extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 extern crate rusoto_kms;
 
-
-
 pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::*;
     use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput, ScanInput};
-    use rusoto_kms::*;
     use rusoto_kms::KmsClient;
+    use rusoto_kms::*;
     use std::collections::HashMap;
 
     #[macro_export]
@@ -62,23 +60,21 @@ pub mod tables {
     /// Options for encryption
     #[derive(Clone, Debug, Default)]
     pub struct EncryptOptions {
-    /// The AWS region to use when calling KMS
-    pub region: String,
+        /// The AWS region to use when calling KMS
+        pub region: String,
 
-    /// KMS key ID, ARN, alias or alias ARN
-    pub key: String,
+        /// KMS key ID, ARN, alias or alias ARN
+        pub key: String,
 
-    /// AWS KMS encryption context
-
-    pub encryption_context: HashMap<String,String>
+        /// AWS KMS encryption context
+        pub encryption_context: HashMap<String, String>,
     }
 
-
-    fn encrypt_secret(data: &String, options: &EncryptOptions) -> Result<EncryptResponse, EncryptError>{
+    fn encrypt_secret(
+        data: &String,
+        options: &EncryptOptions,
+    ) -> Result<EncryptResponse, EncryptError> {
         let kms_client = KmsClient::simple(Region::UsWest2);
-        let datakey = generate_data_key(options).unwrap();
-        let key = datakey.plaintext.unwrap();
-        let key_enc = datakey.ciphertext_blob;
         let mut enc_req = EncryptRequest::default();
         enc_req.encryption_context = Some(options.encryption_context.clone());
         enc_req.key_id = options.key.clone();
@@ -87,21 +83,6 @@ pub mod tables {
         let enc_res = kms_client.encrypt(&enc_req).sync().unwrap();
         Ok(enc_res)
     }
-
-    fn generate_data_key(options: &EncryptOptions) -> Result<GenerateDataKeyResponse, GenerateDataKeyError> {
-    let kms = KmsClient::simple(Region::UsWest2);
-    let req = GenerateDataKeyRequest {
-        encryption_context: Option::Some(options.encryption_context.clone()),
-        key_id: options.key.clone(),
-        key_spec: Option::Some("AES_256".into()),
-        grant_tokens: Option::None,
-        number_of_bytes: Option::None
-    };
-
-    let res = kms.generate_data_key(&req).sync().unwrap();
-
-    Ok(res)
-}
 
     pub fn list_tables_default() -> () {
         // First grabbing user credentials from .aws/credentials file
@@ -127,29 +108,29 @@ pub mod tables {
 
     pub fn get_region(reg: &str) -> Option<Region> {
         match reg {
-            "apnortheast1" => return Some(Region::ApNortheast1),
-            "apnortheast2" => return Some(Region::ApNortheast2),
-            "apsout1" => return Some(Region::ApSouth1),
-            "apsoutheast1" => return Some(Region::ApSoutheast1),
-            "apsoutheast2" => return Some(Region::ApSoutheast2),
-            "cacentral1" => return Some(Region::CaCentral1),
-            "eucentral1" => return Some(Region::EuCentral1),
-            "euwest1" => return Some(Region::EuWest1),
-            "euwest2" => return Some(Region::EuWest2),
-            "euwest3" => return Some(Region::EuWest3),
-            "saeast1" => return Some(Region::SaEast1),
-            "useast1" => return Some(Region::UsEast1),
-            "useast2" => return Some(Region::UsEast2),
-            "uswest1" => return Some(Region::UsWest1),
-            "uswest2" => return Some(Region::UsWest2),
-            "usgovwest1" => return Some(Region::UsGovWest1),
-            "cnnorth1" => return Some(Region::CnNorth1),
-            "cnnorthwest1" => return Some(Region::CnNorthwest1),
+            "ap-northeast-1" => return Some(Region::ApNortheast1),
+            "ap-northeast-2" => return Some(Region::ApNortheast2),
+            "ap-south-1" => return Some(Region::ApSouth1),
+            "ap-southeast-1" => return Some(Region::ApSoutheast1),
+            "ap-southeast-2" => return Some(Region::ApSoutheast2),
+            "ca-central-1" => return Some(Region::CaCentral1),
+            "eu-central-1" => return Some(Region::EuCentral1),
+            "eu-west-1" => return Some(Region::EuWest1),
+            "eu-west-2" => return Some(Region::EuWest2),
+            "eu-west-3" => return Some(Region::EuWest3),
+            "sa-east-1" => return Some(Region::SaEast1),
+            "us-east-1" => return Some(Region::UsEast1),
+            "us-east-2" => return Some(Region::UsEast2),
+            "us-west-1" => return Some(Region::UsWest1),
+            "us-west-2" => return Some(Region::UsWest2),
+            "us-govwest-1" => return Some(Region::UsGovWest1),
+            "cn-north-1" => return Some(Region::CnNorth1),
+            "cn-northwest-1" => return Some(Region::CnNorthwest1),
             _ => None,
         }
     }
 
-    pub fn list_tables_region(region: Region) -> () {
+    pub fn list_tables(region: Region) -> () {
         let client = DynamoDbClient::simple(region);
         let list_tables_input: ListTablesInput = Default::default();
 
@@ -170,24 +151,7 @@ pub mod tables {
         }
     }
 
-    pub fn table_create_default() -> () {
-        let client = DynamoDbClient::simple(Region::UsWest2);
-        let mut table_creator = CreateTableInput::default();
-        let read_capacity = 1;
-        let write_capacity = 1;
-        table_creator.table_name = "ironclad-store".to_string();
-        table_creator.provisioned_throughput.read_capacity_units = read_capacity;
-        table_creator.provisioned_throughput.write_capacity_units = write_capacity;
-        table_creator.key_schema = key_schema!("name" => "HASH","version" => "RANGE");
-        table_creator.attribute_definitions = attributes!("name" => "S","version" => "N");
-        client
-            .create_table(&table_creator)
-            .sync()
-            .expect("Create default table failed.");
-        println!("Table name is {}", table_creator.table_name);
-    }
-
-    pub fn table_create_reg_name(reg: Region, name: &str) -> () {
+    pub fn table_creator(reg: Region, name: &str) -> () {
         let client = DynamoDbClient::simple(reg);
         let tname = name.to_string();
         let mut table_creator = CreateTableInput::default();
@@ -206,19 +170,7 @@ pub mod tables {
         println!("Table name is {}", table_creator.table_name);
     }
 
-    pub fn table_deleter(name: &str) -> () {
-        let client = DynamoDbClient::simple(Region::UsWest2);
-        let mut table_deleter = DeleteTableInput::default();
-        let new_delete_table = name.to_string();
-        table_deleter.table_name = new_delete_table;
-        client
-            .delete_table(&table_deleter)
-            .sync()
-            .expect("Delete Table Failed");
-        println!("Successfully deleted: {:?}", table_deleter.table_name);
-    }
-
-    pub fn table_deleter_reg(reg: Region, name: &str) -> () {
+    pub fn table_deleter(reg: Region, name: &str) -> () {
         let client = DynamoDbClient::simple(reg);
         let mut table_deleter = DeleteTableInput::default();
         let new_delete_table = name.to_string();
@@ -231,7 +183,7 @@ pub mod tables {
     }
 
     pub fn delete_item(table_name: &str, secret_name: &str, secret_number: &str) -> () {
-        let client = DynamoDbClient::simple(Region::UsWest2);
+        let client = DynamoDbClient::simple(Region::default());
         let mut delete_item_ = DeleteItemInput::default();
         let mut map_delete = HashMap::new();
         let attribute = "name".to_string();
@@ -249,8 +201,7 @@ pub mod tables {
     pub fn put_item(table_name: &str, secret_name: &str, secret: &str, version_number: &str) -> () {
         match version_number.parse::<i32>() {
             Ok(version_num) => {
-                println!("Here");
-                let client = DynamoDbClient::simple(Region::UsWest2);
+                let client = DynamoDbClient::simple(Region::default());
                 let mut put_item_creator = PutItemInput::default();
                 let mut map = HashMap::new();
                 let attribute_name = "name".to_string();
@@ -262,12 +213,15 @@ pub mod tables {
                 let mut encryption_context = HashMap::new();
                 encryption_context.insert("entity".to_owned(), "admin".to_owned());
                 let options = EncryptOptions {
-                            encryption_context: encryption_context,
-                                        key: "alias/TestKey".into(),
-                                        region: "us-west-2".into()
+                    encryption_context: encryption_context,
+                    key: "alias/TestKey".into(),
+                    region: "us-west-2".into(),
                 };
                 let data = secret.into();
-                let ensec = encrypt_secret(&data, &options).unwrap().ciphertext_blob.unwrap();
+                let ensec = encrypt_secret(&data, &options)
+                    .unwrap()
+                    .ciphertext_blob
+                    .unwrap();
                 map.insert(attribute_secret, val!(B => ensec));
                 put_item_creator.table_name = table_name.to_string();
                 put_item_creator.item = map;
@@ -283,7 +237,7 @@ pub mod tables {
     }
 
     pub fn list_items(table_name: &str) -> () {
-        let client = DynamoDbClient::simple(Region::UsWest2);
+        let client = DynamoDbClient::simple(Region::default());
         let mut scan_table_input = ScanInput::default();
         scan_table_input.table_name = table_name.to_string();
         let scan_output = client.scan(&scan_table_input).sync().expect("Scan Failed");
