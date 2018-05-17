@@ -3,6 +3,7 @@ extern crate iron_lib;
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
+extern crate rusoto_kms;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
