@@ -7,6 +7,6 @@ rust:
 before_script:
   - rustup component add rustfmt-preview
 script:
+  - cargo fmt --all -- --write-mode=check
   - cargo build --verbose --all
   - cargo test --verbose --all
-  - cargo fmt -- --write-mode=check
