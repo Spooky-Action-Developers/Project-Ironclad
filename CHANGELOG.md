@@ -2,16 +2,22 @@
 
 All notable changes to the project will be documented here.
 
-## 0.3.2 - 2018-05-14
+## 0.4.1 - 2018-05-17
 ____________________________________________________________________________
 
 ## Added
-  - New ```put``` functionality to store with a 
-  - Added KMS to encrypt and decrypt secrets on ```put``` and ```get```
+  - New ```put``` functionality to store with a secret value
+  - Added KMS to encrypt and decrypt on ```put``` and ```get```
+  - Ability to ```get``` a secret
+  - Ability to store a secret from a file
 ## Changed
-  - Main functionality updated for put subcommand to take secret values
-  - Updated ```put_item``` function to add secret attribute and store it to AWS
-##Removed
+  - Default region settings for all functions in lib.rs
+  - Output messages to storage and delete in main.rs
+  - Travis file to accomodate changes to rustfmt
+  - Main functionality for put subcommand takes secret value
+  - Updated put_item logic to store secret value field in DynamDB.
+## Removed
+  - Redundant codebase for default vs. regional values for functions in lib.rs
   - Refactored main code to remove redundant conditionals, increasing efficiency of checks
 
 ## 0.3.1 - 2018-05-03
