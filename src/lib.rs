@@ -75,9 +75,6 @@ pub mod tables {
         options: &EncryptOptions,
     ) -> Result<EncryptResponse, EncryptError> {
         let kms_client = KmsClient::simple(Region::UsWest2);
-        let datakey = generate_data_key(options).unwrap();
-        let key = datakey.plaintext.unwrap();
-        let key_enc = datakey.ciphertext_blob;
         let mut enc_req = EncryptRequest::default();
         enc_req.encryption_context = Some(options.encryption_context.clone());
         enc_req.key_id = options.key.clone();
@@ -85,23 +82,6 @@ pub mod tables {
 
         let enc_res = kms_client.encrypt(&enc_req).sync().unwrap();
         Ok(enc_res)
-    }
-
-    fn generate_data_key(
-        options: &EncryptOptions,
-    ) -> Result<GenerateDataKeyResponse, GenerateDataKeyError> {
-        let kms = KmsClient::simple(Region::UsWest2);
-        let req = GenerateDataKeyRequest {
-            encryption_context: Option::Some(options.encryption_context.clone()),
-            key_id: options.key.clone(),
-            key_spec: Option::Some("AES_256".into()),
-            grant_tokens: Option::None,
-            number_of_bytes: Option::None,
-        };
-
-        let res = kms.generate_data_key(&req).sync().unwrap();
-
-        Ok(res)
     }
 
     pub fn list_tables_default() -> () {
@@ -221,7 +201,6 @@ pub mod tables {
     pub fn put_item(table_name: &str, secret_name: &str, secret: &str, version_number: &str) -> () {
         match version_number.parse::<i32>() {
             Ok(version_num) => {
-                println!("Here");
                 let client = DynamoDbClient::simple(Region::default());
                 let mut put_item_creator = PutItemInput::default();
                 let mut map = HashMap::new();

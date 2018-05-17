@@ -285,7 +285,7 @@ fn main() {
                         x.value_of("version").unwrap(),
                     );
                 } else {
-                    println!("Storing {:?} in default table", x.value_of("identifier"));
+                    println!("Storing {:?} in default table", x.value_of("identifier").unwrap());
                     tables::put_item(
                         "ironclad-store",
                         x.value_of("identifier").unwrap(),
