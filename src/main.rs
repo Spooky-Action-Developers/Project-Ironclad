@@ -231,7 +231,7 @@ fn main() {
                     let mut contents = String::new();
                     file.read_to_string(&mut contents)
                         .expect("Unable to read the file");
-                    
+
                     if x.is_present("version") && x.is_present("table") {
                         println!(
                             "Storing file: {:?} version {} with identifier {:?} in table: {:?}",
@@ -240,7 +240,12 @@ fn main() {
                             x.value_of("identifier").unwrap(),
                             x.value_of("table").unwrap()
                         );
-                        tables::put_item(x.value_of("table").unwrap(),x.value_of("identifier").unwrap(),contents.as_str(),x.value_of("version").unwrap());
+                        tables::put_item(
+                            x.value_of("table").unwrap(),
+                            x.value_of("identifier").unwrap(),
+                            contents.as_str(),
+                            x.value_of("version").unwrap(),
+                        );
                     } else if x.is_present("version") {
                         println!(
                             "Storing file: {:?} version {} with identifier {:?} in default table",
@@ -248,7 +253,12 @@ fn main() {
                             x.value_of("version").unwrap(),
                             x.value_of("identifier").unwrap()
                         );
-                        tables::put_item("ironclad-store",x.value_of("identifier").unwrap(),contents.as_str(),x.value_of("version").unwrap());
+                        tables::put_item(
+                            "ironclad-store",
+                            x.value_of("identifier").unwrap(),
+                            contents.as_str(),
+                            x.value_of("version").unwrap(),
+                        );
                     } else if x.is_present("table") {
                         println!(
                             "Storing file: {:?} with identifer {:?} in table: {:?}",
@@ -256,7 +266,12 @@ fn main() {
                             x.value_of("idenitifier").unwrap(),
                             x.value_of("table").unwrap()
                         );
-                        tables::put_item(x.value_of("table").unwrap(),x.value_of("identifier").unwrap(),contents.as_str(),"1");
+                        tables::put_item(
+                            x.value_of("table").unwrap(),
+                            x.value_of("identifier").unwrap(),
+                            contents.as_str(),
+                            "1",
+                        );
                     } else {
                         println!(
                             "Storing file: {:?} with idenitifier {:?} in default table",
