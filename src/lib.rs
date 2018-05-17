@@ -74,7 +74,7 @@ pub mod tables {
         data: &String,
         options: &EncryptOptions,
     ) -> Result<EncryptResponse, EncryptError> {
-        let kms_client = KmsClient::simple(Region::UsWest2);
+        let kms_client = KmsClient::simple(Region::default());
         let mut enc_req = EncryptRequest::default();
         enc_req.encryption_context = Some(options.encryption_context.clone());
         enc_req.key_id = options.key.clone();
@@ -82,28 +82,6 @@ pub mod tables {
 
         let enc_res = kms_client.encrypt(&enc_req).sync().unwrap();
         Ok(enc_res)
-    }
-
-    pub fn list_tables_default() -> () {
-        // First grabbing user credentials from .aws/credentials file
-        let client = DynamoDbClient::simple(Region::UsWest2);
-        let list_tables_input: ListTablesInput = Default::default();
-
-        match client.list_tables(&list_tables_input).sync() {
-            Ok(output) => match output.table_names {
-                Some(table_name_list) => {
-                    println!("Tables in database:");
-
-                    for table_name in table_name_list {
-                        println!("{}", table_name);
-                    }
-                }
-                None => println!("No tables in database!"),
-            },
-            Err(error) => {
-                println!("Error: {:?}", error);
-            }
-        }
     }
 
     pub fn get_region(reg: &str) -> Option<Region> {
@@ -214,8 +192,8 @@ pub mod tables {
                 encryption_context.insert("entity".to_owned(), "admin".to_owned());
                 let options = EncryptOptions {
                     encryption_context: encryption_context,
-                    key: "alias/TestKey".into(),
-                    region: "us-west-2".into(),
+                    key: "alias/ironclad".into(),
+                    region: "us-east-1".into(),
                 };
                 let data = secret.into();
                 let ensec = encrypt_secret(&data, &options)
@@ -234,6 +212,45 @@ pub mod tables {
                 eprintln!("Incorrectly specified version number.");
             }
         }
+    }
+
+    pub fn get_item(table_name: &str, secret_name: &str, version_number: &str) -> () {
+        let client = DynamoDbClient::simple(Region::default());
+        let mut get_item_input = GetItemInput::default();
+        let mut map = HashMap::new();
+        let attribute_name = "name".to_string();
+        let attribute_number = "version".to_string();
+        map.insert(attribute_name, val!(S => &secret_name));
+        map.insert(attribute_number, val!(N =>  &version_number));
+
+        get_item_input.table_name = table_name.to_string();
+        get_item_input.key = map;
+        let retrieved_item = client
+            .get_item(&get_item_input)
+            .sync()
+            .expect("Failed to get requested Item");
+
+        let got_item = retrieved_item.item.unwrap();
+        let got_name = got_item.get("name").unwrap().clone();
+        let secret_name = &*got_name.s.unwrap();
+        let got_version = got_item.get("version").unwrap().clone();
+        let version = got_version.n.unwrap();
+
+        let got_secret = got_item.get("secret").unwrap().clone();
+        let encrypted_secret = got_secret.b.unwrap();
+
+        let mut decrypter = DecryptRequest::default();
+        let mut decryption_context = HashMap::new();
+        decryption_context.insert("entity".to_owned(), "admin".to_owned());
+
+        decrypter.ciphertext_blob = encrypted_secret;
+        decrypter.encryption_context = Some(decryption_context);
+        let kms_client = KmsClient::simple(Region::default());
+        let secret = kms_client.decrypt(&decrypter).sync().unwrap().plaintext.unwrap();
+        println!(
+            "Name: {:?}, Secret: {:?}, Version {:?}",
+            secret_name, secret, version
+        );
     }
 
     pub fn list_items(table_name: &str) -> () {
