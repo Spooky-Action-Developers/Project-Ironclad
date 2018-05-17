@@ -8,6 +8,8 @@ extern crate rusoto_kms;
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
 use rusoto_core::region::Region;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn main() {
     /*Set of region that can be specified. This allows to check values for get_region() functions
@@ -224,26 +226,44 @@ fn main() {
                 if x.is_present("secret") {
                     eprintln!("ERROR: Too many arguments for storage.");
                 } else {
+                    let mut file =
+                        File::open(x.value_of("fileName").unwrap()).expect("Could not open file.");
+                    let mut contents = String::new();
+                    file.read_to_string(&mut contents)
+                        .expect("Unable to read the file");
                     if x.is_present("version") && x.is_present("table") {
                         println!(
-                            "Storing file: {:?} with identifier {:?} in table: {:?}",
+                            "Storing file: {:?} version {} with identifier {:?} in table: {:?}",
                             x.value_of("fileName").unwrap(),
+                            x.value_of("version").unwrap(),
                             x.value_of("identifier").unwrap(),
                             x.value_of("table").unwrap()
                         );
                     } else if x.is_present("version") {
                         println!(
                             "Storing file: {:?} version {} with identifier {:?} in default table",
-                            x.value_of("filename").unwrap(),
+                            x.value_of("fileName").unwrap(),
                             x.value_of("version").unwrap(),
                             x.value_of("identifier").unwrap()
                         );
                     } else if x.is_present("table") {
                         println!(
                             "Storing file: {:?} with identifer {:?} in table: {:?}",
-                            x.value_of("filename").unwrap(),
+                            x.value_of("fileName").unwrap(),
                             x.value_of("idenitifier").unwrap(),
                             x.value_of("table").unwrap()
+                        );
+                    } else {
+                        println!(
+                            "Storing file: {:?} with idenitifier {:?} in default table",
+                            x.value_of("fileName").unwrap(),
+                            x.value_of("identifier").unwrap()
+                        );
+                        tables::put_item(
+                            "ironclad-store",
+                            x.value_of("identifier").unwrap(),
+                            contents.as_str(),
+                            "1",
                         );
                     }
                 }
