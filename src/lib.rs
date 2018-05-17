@@ -1,11 +1,16 @@
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
+extern crate rusoto_kms;
+
+
 
 pub mod tables {
     use rusoto_core::region::Region;
     use rusoto_dynamodb::*;
     use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput, ScanInput};
+    use rusoto_kms::*;
+    use rusoto_kms::KmsClient;
     use std::collections::HashMap;
 
     #[macro_export]
@@ -53,6 +58,50 @@ pub mod tables {
             attr
         }};
     }
+
+    /// Options for encryption
+    #[derive(Clone, Debug, Default)]
+    pub struct EncryptOptions {
+    /// The AWS region to use when calling KMS
+    pub region: String,
+
+    /// KMS key ID, ARN, alias or alias ARN
+    pub key: String,
+
+    /// AWS KMS encryption context
+
+    pub encryption_context: HashMap<String,String>
+    }
+
+
+    fn encrypt_secret(data: &String, options: &EncryptOptions) -> Result<EncryptResponse, EncryptError>{
+        let kms_client = KmsClient::simple(Region::UsWest2);
+        let datakey = generate_data_key(options).unwrap();
+        let key = datakey.plaintext.unwrap();
+        let key_enc = datakey.ciphertext_blob;
+        let mut enc_req = EncryptRequest::default();
+        enc_req.encryption_context = Some(options.encryption_context.clone());
+        enc_req.key_id = options.key.clone();
+        enc_req.plaintext = data.as_bytes().to_vec();
+
+        let enc_res = kms_client.encrypt(&enc_req).sync().unwrap();
+        Ok(enc_res)
+    }
+
+    fn generate_data_key(options: &EncryptOptions) -> Result<GenerateDataKeyResponse, GenerateDataKeyError> {
+    let kms = KmsClient::simple(Region::UsWest2);
+    let req = GenerateDataKeyRequest {
+        encryption_context: Option::Some(options.encryption_context.clone()),
+        key_id: options.key.clone(),
+        key_spec: Option::Some("AES_256".into()),
+        grant_tokens: Option::None,
+        number_of_bytes: Option::None
+    };
+
+    let res = kms.generate_data_key(&req).sync().unwrap();
+
+    Ok(res)
+}
 
     pub fn list_tables_default() -> () {
         // First grabbing user credentials from .aws/credentials file
@@ -208,8 +257,18 @@ pub mod tables {
                 let attribute_secret = "secret".to_string();
                 let attribute_number = "version".to_string();
                 map.insert(attribute_name, val!(S => &secret_name));
-                map.insert(attribute_secret, val!(S => &secret));
                 map.insert(attribute_number, val!(N =>  &version_num));
+
+                let mut encryption_context = HashMap::new();
+                encryption_context.insert("entity".to_owned(), "admin".to_owned());
+                let options = EncryptOptions {
+                            encryption_context: encryption_context,
+                                        key: "alias/TestKey".into(),
+                                        region: "us-west-2".into()
+                };
+                let data = secret.into();
+                let ensec = encrypt_secret(&data, &options).unwrap().ciphertext_blob.unwrap();
+                map.insert(attribute_secret, val!(B => ensec));
                 put_item_creator.table_name = table_name.to_string();
                 put_item_creator.item = map;
                 client
