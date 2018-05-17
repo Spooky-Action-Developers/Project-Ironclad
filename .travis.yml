@@ -9,4 +9,4 @@ before_script:
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
-  - cargo fmt -- --emit=diff
+  - cargo fmt -- --check
