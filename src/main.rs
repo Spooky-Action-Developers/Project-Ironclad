@@ -160,6 +160,9 @@ fn main() {
                     .arg(Arg::with_name("identifier")
                          .help("Name of credential to be retrieved.")
                          .required(true))
+                    .arg(Arg::with_name("version")
+                         .help("Version number associated with item to be retreived.")
+                         .required(true))
                     .arg(Arg::with_name("table")
                          .short("t")
                          .long("table")
@@ -384,9 +387,10 @@ fn main() {
                 x.value_of("table").unwrap()
             );
         } else {
-            println!(
-                "I'd be attempting to retrieve {:?} from default table.",
-                x.value_of("identifier").unwrap()
+            tables::get_item(
+                "ironclad-store",
+                x.value_of("identifier").unwrap(),
+                x.value_of("version").unwrap(),
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
