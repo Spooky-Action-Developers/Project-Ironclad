@@ -246,7 +246,10 @@ pub mod tables {
         decrypter.ciphertext_blob = encrypted_secret;
         decrypter.encryption_context = Some(decryption_context);
         let kms_client = KmsClient::simple(Region::default());
-        let secret = kms_client.decrypt(&decrypter).sync().unwrap().plaintext.unwrap();
+        let secret_digits = kms_client.decrypt(&decrypter).sync().unwrap().plaintext.unwrap();
+
+        let secret = String::from_utf8_lossy(&secret_digits);
+        
         println!(
             "Name: {:?}, Secret: {:?}, Version {:?}",
             secret_name, secret, version
