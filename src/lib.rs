@@ -2,6 +2,8 @@ extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 extern crate rusoto_kms;
+#[macro_use]
+extern crate serde_json;
 
 pub mod tables {
     use rusoto_core::region::Region;
@@ -10,6 +12,7 @@ pub mod tables {
     use rusoto_kms::KmsClient;
     use rusoto_kms::*;
     use std::collections::HashMap;
+    use serde_json::to_string_pretty;
 
     #[macro_export]
     macro_rules! attributes {
@@ -253,12 +256,24 @@ pub mod tables {
             .plaintext
             .unwrap();
 
-        let secret = String::from_utf8_lossy(&secret_digits);
+        let secret = "\n\t".to_string() + &(String::from_utf8_lossy(&secret_digits).replace("\\n","\n\t")) + &("\n\r".to_string());
+        let json_object = json!({
+                                "Credential ID":
+                                    {
+                                        "Name": secret_name,
+                                        "Version": version
+                                    },
+                                "Secret":
+                                    [
+                                        secret
+                                    ]
+        
+                                });
 
-        println!(
-            "Name: {:?}, Secret: {:?}, Version {:?}",
-            secret_name, secret, version
-        );
+        println!("{}",to_string_pretty(&json_object).unwrap()
+                 .replace("\\n\\t","\n\t")
+                 .replace("\\n","\n\t")
+                 .replace("\\r","\r    "));
     }
 
     pub fn list_items(table_name: &str) -> () {
