@@ -233,8 +233,10 @@ pub mod tables {
             .sync()
             .expect("Failed to get requested Item");
 
-        let got_item = retrieved_item.item.unwrap();
-        let got_name = got_item.get("name").unwrap().clone();
+        match retrieved_item.item
+        {
+            Some(got_item) => {
+                let got_name = got_item.get("name").unwrap().clone();
         let secret_name = &*got_name.s.unwrap();
         let got_version = got_item.get("version").unwrap().clone();
         let version = got_version.n.unwrap();
@@ -274,6 +276,9 @@ pub mod tables {
                  .replace("\\n\\t","\n\t")
                  .replace("\\n","\n\t")
                  .replace("\\r","\r    "));
+            }
+        None => {println!("Secret does not exist.");}
+    }
     }
 
     pub fn list_items(table_name: &str) -> () {
