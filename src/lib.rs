@@ -2,6 +2,8 @@ extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_dynamodb;
 extern crate rusoto_kms;
+#[macro_use]
+extern crate serde_json;
 
 pub mod tables {
     use rusoto_core::region::Region;
@@ -9,6 +11,7 @@ pub mod tables {
     use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput, ScanInput};
     use rusoto_kms::KmsClient;
     use rusoto_kms::*;
+    use serde_json::to_string_pretty;
     use std::collections::HashMap;
 
     #[macro_export]
@@ -230,35 +233,58 @@ pub mod tables {
             .sync()
             .expect("Failed to get requested Item");
 
-        let got_item = retrieved_item.item.unwrap();
-        let got_name = got_item.get("name").unwrap().clone();
-        let secret_name = &*got_name.s.unwrap();
-        let got_version = got_item.get("version").unwrap().clone();
-        let version = got_version.n.unwrap();
+        match retrieved_item.item {
+            Some(got_item) => {
+                let got_name = got_item.get("name").unwrap().clone();
+                let secret_name = &*got_name.s.unwrap();
+                let got_version = got_item.get("version").unwrap().clone();
+                let version = got_version.n.unwrap();
 
-        let got_secret = got_item.get("secret").unwrap().clone();
-        let encrypted_secret = got_secret.b.unwrap();
+                let got_secret = got_item.get("secret").unwrap().clone();
+                let encrypted_secret = got_secret.b.unwrap();
 
-        let mut decrypter = DecryptRequest::default();
-        let mut decryption_context = HashMap::new();
-        decryption_context.insert("entity".to_owned(), "admin".to_owned());
+                let mut decrypter = DecryptRequest::default();
+                let mut decryption_context = HashMap::new();
+                decryption_context.insert("entity".to_owned(), "admin".to_owned());
 
-        decrypter.ciphertext_blob = encrypted_secret;
-        decrypter.encryption_context = Some(decryption_context);
-        let kms_client = KmsClient::simple(Region::default());
-        let secret_digits = kms_client
-            .decrypt(&decrypter)
-            .sync()
-            .unwrap()
-            .plaintext
-            .unwrap();
+                decrypter.ciphertext_blob = encrypted_secret;
+                decrypter.encryption_context = Some(decryption_context);
+                let kms_client = KmsClient::simple(Region::default());
+                let secret_digits = kms_client
+                    .decrypt(&decrypter)
+                    .sync()
+                    .unwrap()
+                    .plaintext
+                    .unwrap();
 
-        let secret = String::from_utf8_lossy(&secret_digits);
+                let secret = "\n\t".to_string()
+                    + &(String::from_utf8_lossy(&secret_digits).replace("\\n", "\n\t"))
+                    + &("\n\r".to_string());
+                let json_object = json!({
+                                "Credential ID":
+                                    {
+                                        "Name": secret_name,
+                                        "Version": version
+                                    },
+                                "Secret":
+                                    [
+                                        secret
+                                    ]
+                                });
 
-        println!(
-            "Name: {:?}, Secret: {:?}, Version {:?}",
-            secret_name, secret, version
-        );
+                println!(
+                    "{}",
+                    to_string_pretty(&json_object)
+                        .unwrap()
+                        .replace("\\n\\t", "\n\t")
+                        .replace("\\n", "\n\t")
+                        .replace("\\r", "\r    ")
+                );
+            }
+            None => {
+                println!("Secret does not exist.");
+            }
+        }
     }
 
     pub fn list_items(table_name: &str) -> () {
