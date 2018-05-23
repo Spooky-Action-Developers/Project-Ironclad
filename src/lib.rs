@@ -287,6 +287,33 @@ pub mod tables {
         }
     }
 
+    pub fn get_all(table_name: &str)->(){
+    let client = DynamoDbClient::simple(Region::default());
+    let mut scan_table_input = ScanInput::default();
+    scan_table_input.table_name = table_name.to_string();
+    let scan_output = client.scan(&scan_table_input).sync().expect("Scan Failed");
+    println!(
+        "There are {:?} items in {:?}\n",
+        scan_output.count.unwrap(),
+        scan_table_input.table_name
+    );
+    match scan_output.items{
+        Some(vector) => {
+            let mut count = 1;
+            for secrets in vector {
+                let mut secret = secrets.get("name").unwrap().clone();
+                let secret_name = &*secret.s.unwrap();
+
+                let mut versions = secrets.get("version").unwrap().clone();
+                let version = versions.n.unwrap();
+                get_item(table_name, secret_name, &version);
+
+            }
+        }
+        None => {}
+    }
+}
+
     pub fn list_items(table_name: &str) -> () {
         let client = DynamoDbClient::simple(Region::default());
         let mut scan_table_input = ScanInput::default();
