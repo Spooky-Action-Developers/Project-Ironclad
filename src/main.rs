@@ -7,6 +7,7 @@ extern crate rusoto_kms;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
+use iron_lib::tables::get_all;
 use rusoto_core::region::Region;
 use std::fs::File;
 use std::io::prelude::*;
@@ -415,8 +416,10 @@ fn main() {
                 "I'd be attempting to retrieve all secrets from: {:?}",
                 x.value_of("table").unwrap()
             );
+            get_all(x.value_of("table").unwrap());
         } else {
             println!("I'd be attempting to retrieve all secrets from default table.");
+            get_all("ironclad-store");
         }
     } else if let Some(x) = app_matches.subcommand_matches("get") {
         if x.is_present("table") {
