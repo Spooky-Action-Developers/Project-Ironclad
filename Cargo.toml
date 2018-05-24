@@ -11,7 +11,7 @@ path = "src/lib.rs"
 [dependencies]
 rusoto_core = "0.32.0"
 rusoto_kms = "0.32.0"
-rusoto_credential = "0.8.0"
+rusoto_credential = "0.11.0"
 rusoto_iam = "0.32.0"
 rusoto_dynamodb = "0.32.0"
 clap = "2.26.0"
