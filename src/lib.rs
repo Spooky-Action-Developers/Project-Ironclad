@@ -77,7 +77,7 @@ pub mod tables {
         data: &String,
         options: &EncryptOptions,
     ) -> Result<EncryptResponse, EncryptError> {
-        let kms_client = KmsClient::simple(Region::UsEast1);
+        let kms_client = KmsClient::simple(Region::default());
         let mut enc_req = EncryptRequest::default();
         enc_req.encryption_context = Some(options.encryption_context.clone());
         enc_req.key_id = options.key.clone();
