@@ -7,8 +7,6 @@ extern crate rusoto_kms;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use iron_lib::tables;
-use iron_lib::tables::get_all;
-use rusoto_core::region::Region;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -202,228 +200,119 @@ fn main() {
 
     if let Some(x) = app_matches.subcommand_matches("list") {
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
-            match region {
-                Some(reg) => {
-                    tables::list_tables(reg);
-                } //if region correctly parsed, list tables in region
-                None => {
-                    //else: display error informing what values can be used
-                    eprintln!("Error: Region not correctly specified...\n");
-                    let mut reg_list_string = "";
-                    eprintln!("Must be in list:{}", reg_list_string);
-                    for region in regions {
-                        println!("{}", region);
-                    }
+        match region {
+            Some(reg) => {
+                tables::list_tables(reg);
+            } //if region correctly parsed, list tables in region
+            None => {
+                //else: display error informing what values can be used
+                eprintln!("Error: Region not correctly specified...\n");
+                let mut reg_list_string = "";
+                eprintln!("Must be in list:{}", reg_list_string);
+                for region in regions {
+                    println!("{}", region);
                 }
             }
+        }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
-        {
-            if x.is_present("fileName") {
-                if x.is_present("secret") {
-                    eprintln!("ERROR: Too many arguments for storage.");
-                } else {
-                    let mut file =
-                        File::open(x.value_of("fileName").unwrap()).expect("Could not open file.");
-                    let mut contents = String::new();
-                    file.read_to_string(&mut contents)
-                        .expect("Unable to read the file");
-
-                    if x.is_present("version") && x.is_present("table") {
-                        println!(
-                            "Storing file: {:?} version {} with identifier {:?} in table: {:?}",
-                            x.value_of("fileName").unwrap(),
-                            x.value_of("version").unwrap(),
-                            x.value_of("identifier").unwrap(),
-                            x.value_of("table").unwrap()
-                        );
-                        tables::put_item(
-                            x.value_of("table").unwrap(),
-                            x.value_of("identifier").unwrap(),
-                            contents.as_str(),
-                            x.value_of("version").unwrap(),
-                        );
-                    } else if x.is_present("version") {
-                        println!(
-                            "Storing file: {:?} version {} with identifier {:?} in default table",
-                            x.value_of("fileName").unwrap(),
-                            x.value_of("version").unwrap(),
-                            x.value_of("identifier").unwrap()
-                        );
-                        tables::put_item(
-                            "ironclad-store",
-                            x.value_of("identifier").unwrap(),
-                            contents.as_str(),
-                            x.value_of("version").unwrap(),
-                        );
-                    } else if x.is_present("table") {
-                        println!(
-                            "Storing file: {:?} with identifer {:?} in table: {:?}",
-                            x.value_of("fileName").unwrap(),
-                            x.value_of("idenitifier").unwrap(),
-                            x.value_of("table").unwrap()
-                        );
-                        tables::put_item(
-                            x.value_of("table").unwrap(),
-                            x.value_of("identifier").unwrap(),
-                            contents.as_str(),
-                            "1",
-                        );
-                    } else {
-                        println!(
-                            "Storing file: {:?} with idenitifier {:?} in default table",
-                            x.value_of("fileName").unwrap(),
-                            x.value_of("identifier").unwrap()
-                        );
-                        tables::put_item(
-                            "ironclad-store",
-                            x.value_of("identifier").unwrap(),
-                            contents.as_str(),
-                            "1",
-                        );
-                    }
-                }
-            } else if x.is_present("table") {
-                if x.is_present("version") {
-                    println!(
-                        "Storing secret {:?} version {} in table: {:?}",
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("version").unwrap(),
-                        x.value_of("table").unwrap()
-                    );
-                    tables::put_item(
-                        x.value_of("table").unwrap(),
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("secret").unwrap(),
-                        x.value_of("version").unwrap(),
-                    );
-                } else {
-                    println!(
-                        "Storing secret {:?} in table: {:?}",
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("table").unwrap()
-                    );
-                    tables::put_item(
-                        x.value_of("table").unwrap(),
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("secret").unwrap(),
-                        "1",
-                    );
-                }
+        if x.is_present("fileName") {
+            if x.is_present("secret") {
+                eprintln!("ERROR: Too many arguments for storage.");
             } else {
-                if x.is_present("version") {
-                    println!(
-                        "Storing {:?} version {} in default table",
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("version").unwrap()
-                    );
-                    tables::put_item(
-                        "ironclad-store",
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("secret").unwrap(),
-                        x.value_of("version").unwrap(),
-                    );
-                } else {
-                    println!(
-                        "Storing {:?} in default table",
-                        x.value_of("identifier").unwrap()
-                    );
-                    tables::put_item(
-                        "ironclad-store",
-                        x.value_of("identifier").unwrap(),
-                        x.value_of("secret").unwrap(),
-                        "1",
-                    );
-                }
+                let mut file =
+                    File::open(x.value_of("fileName").unwrap()).expect("Could not open file.");
+                let mut contents = String::new();
+                file.read_to_string(&mut contents)
+                    .expect("Unable to read the file");
+
+                let version = x.value_of("version").unwrap_or("1");
+                let table = x.value_of("table").unwrap_or("ironclad-store");
+                println!(
+                    "Storing {} version {}...",
+                    x.value_of("identifier").unwrap(),
+                    version
+                );
+                tables::put_item(
+                    table,
+                    x.value_of("identifier").unwrap(),
+                    contents.as_str(),
+                    version,
+                );
             }
+        } else {
+            let version = x.value_of("version").unwrap_or("1");
+            let table = x.value_of("table").unwrap_or("ironclad-store");
+            println!(
+                "Storing {} version {}...",
+                x.value_of("identifier").unwrap(),
+                version
+            );
+            tables::put_item(
+                table,
+                x.value_of("identifier").unwrap(),
+                x.value_of("secret").unwrap(),
+                version,
+            );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete") {
-        if x.is_present("tableName") && x.is_present("identifier") && x.is_present("ID") {
-            println!(
-                "Deleteting {:?}, version number {:?} from table {:?}.",
-                x.value_of("identifier").unwrap(),
-                x.value_of("ID").unwrap(),
-                x.value_of("tableName").unwrap()
-            );
-            tables::delete_item(
-                x.value_of("tableName").unwrap(),
-                x.value_of("identifier").unwrap(),
-                x.value_of("ID").unwrap(),
-            )
-        } else {
-            println!(
-                "Deleting {:?}, version number {:?} from default table.",
-                x.value_of("identifier").unwrap(),
-                x.value_of("ID").unwrap()
-            );
-            tables::delete_item(
-                "ironclad-store",
-                x.value_of("identifier").unwrap(),
-                x.value_of("ID").unwrap(),
-            );
-        }
+        let table = x.value_of("tableName").unwrap_or("ironclad-store");
+        println!(
+            "Deleting {}, version number {}...",
+            x.value_of("identifier").unwrap(),
+            x.value_of("ID").unwrap()
+        );
+        tables::delete_item(
+            table,
+            x.value_of("identifier").unwrap(),
+            x.value_of("ID").unwrap(),
+        );
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
-        let name = x.value_of("name").unwrap_or("ironclad-store"); 
+        let name = x.value_of("name").unwrap_or("ironclad-store");
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
         match region {
-                Some(reg) => {
-                    tables::table_creator(reg,name);
-                } //if region correctly parsed, list tables in region
-                None => {
-                    //else: display error informing what values can be used
-                    eprintln!("Error: Region not correctly specified...\n");
-                    let mut reg_list_string = "";
-                    eprintln!("Must be in list:{}", reg_list_string);
-                    for region in regions {
-                        println!("{}", region);
-                    }
+            Some(reg) => {
+                tables::table_creator(reg, name);
+            } //if region correctly parsed, list tables in region
+            None => {
+                //else: display error informing what values can be used
+                eprintln!("Error: Region not correctly specified...\n");
+                let mut reg_list_string = "";
+                eprintln!("Must be in list:{}", reg_list_string);
+                for region in regions {
+                    println!("{}", region);
                 }
             }
+        }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         let name = x.value_of("table").unwrap_or("ironclad-store");
         tables::list_items(name);
     } else if let Some(x) = app_matches.subcommand_matches("getall") {
-        if x.is_present("table") {
-            println!(
-                "I'd be attempting to retrieve all secrets from: {:?}",
-                x.value_of("table").unwrap()
-            );
-            get_all(x.value_of("table").unwrap());
-        } else {
-            println!("I'd be attempting to retrieve all secrets from default table.");
-            get_all("ironclad-store");
-        }
+        let table = x.value_of("table").unwrap_or("ironclad-store");
+        println!("Retrieving secrets from {}...", table);
+        tables::get_all(table);
     } else if let Some(x) = app_matches.subcommand_matches("get") {
-        if x.is_present("table") {
-            println!(
-                "I'd be attempting to retrieve {:?} from: {:?}",
-                x.value_of("identifier").unwrap(),
-                x.value_of("table").unwrap()
-            );
-        } else {
-            tables::get_item(
-                "ironclad-store",
-                x.value_of("identifier").unwrap(),
-                x.value_of("version").unwrap(),
-            );
-        }
+        let table = x.value_of("table").unwrap_or("ironclad-store");
+        tables::get_item(
+            table,
+            x.value_of("identifier").unwrap(),
+            x.value_of("version").unwrap(),
+        );
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
-            match region {
-                Some(reg) => {
-                    let mut delete_table_name = x.value_of("tableName").unwrap();
-                    tables::table_deleter(reg, delete_table_name);
-                } //if region correctly parsed, list tables in region
-                None => {
-                    //else: display error informing what values can be used
-                    eprintln!("Error: Region not correctly specified...\n");
-                    let mut reg_list_string = "";
-                    eprintln!("Must be in list:{}", reg_list_string);
-                    for region in regions {
-                        println!("{}", region);
-                    }
+        match region {
+            Some(reg) => {
+                let mut delete_table_name = x.value_of("tableName").unwrap();
+                tables::table_deleter(reg, delete_table_name);
+            } //if region correctly parsed, list tables in region
+            None => {
+                //else: display error informing what values can be used
+                eprintln!("Error: Region not correctly specified...\n");
+                let mut reg_list_string = "";
+                eprintln!("Must be in list:{}", reg_list_string);
+                for region in regions {
+                    println!("{}", region);
                 }
             }
-            let mut delete_table_name = x.value_of("tableName").unwrap();
-            tables::table_deleter(Region::default(), delete_table_name);
+        }
     }
 }

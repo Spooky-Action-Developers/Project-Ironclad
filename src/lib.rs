@@ -77,7 +77,7 @@ pub mod tables {
         data: &String,
         options: &EncryptOptions,
     ) -> Result<EncryptResponse, EncryptError> {
-        let kms_client = KmsClient::simple(Region::default());
+        let kms_client = KmsClient::simple(Region::UsEast1);
         let mut enc_req = EncryptRequest::default();
         enc_req.encryption_context = Some(options.encryption_context.clone());
         enc_req.key_id = options.key.clone();
@@ -89,7 +89,7 @@ pub mod tables {
 
     pub fn get_region(reg: &str) -> Option<Region> {
         match reg {
-            "default"        => return Some(Region::default()),
+            "default" => return Some(Region::default()),
             "ap-northeast-1" => return Some(Region::ApNortheast1),
             "ap-northeast-2" => return Some(Region::ApNortheast2),
             "ap-south-1" => return Some(Region::ApSouth1),
