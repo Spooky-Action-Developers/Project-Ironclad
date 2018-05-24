@@ -201,10 +201,8 @@ fn main() {
      * Returns specified information with helpful messages*/
 
     if let Some(x) = app_matches.subcommand_matches("list") {
-        if x.is_present("region") {
-            //check if region was set
-            let reg = tables::get_region(x.value_of("region").unwrap());
-            match reg {
+        let region = tables::get_region(x.value_of("region").unwrap_or("default"));
+            match region {
                 Some(reg) => {
                     tables::list_tables(reg);
                 } //if region correctly parsed, list tables in region
@@ -218,9 +216,6 @@ fn main() {
                     }
                 }
             }
-        } else {
-            tables::list_tables(Region::default()); //region flag not set, list default region
-        }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
         {
             if x.is_present("fileName") {
@@ -367,11 +362,11 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
-        if x.is_present("name") && x.is_present("region") {
-            let reg = tables::get_region(x.value_of("region").unwrap());
-            match reg {
+        let name = x.value_of("name").unwrap_or("ironclad-store"); 
+        let region = tables::get_region(x.value_of("region").unwrap_or("default"));
+        match region {
                 Some(reg) => {
-                    tables::table_creator(reg, x.value_of("name").unwrap());
+                    tables::table_creator(reg,name);
                 } //if region correctly parsed, list tables in region
                 None => {
                     //else: display error informing what values can be used
@@ -383,33 +378,9 @@ fn main() {
                     }
                 }
             }
-        } else if x.is_present("name") {
-            tables::table_creator(Region::default(), x.value_of("name").unwrap())
-        } else if x.is_present("region") {
-            let reg = tables::get_region(x.value_of("region").unwrap());
-            match reg {
-                Some(reg) => {
-                    tables::table_creator(reg, "ironclad-store");
-                } //if region correctly parsed, list tables in region
-                None => {
-                    //else: display error informing what values can be used
-                    eprintln!("Error: Region not correctly specified...\n");
-                    let mut reg_list_string = "";
-                    eprintln!("Must be in list:{}", reg_list_string);
-                    for region in regions {
-                        println!("{}", region);
-                    }
-                }
-            }
-        } else {
-            tables::table_creator(Region::default(), "ironclad-store");
-        }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
-        if x.is_present("table") {
-            tables::list_items(x.value_of("table").unwrap());
-        } else {
-            tables::list_items("ironclad-store");
-        }
+        let name = x.value_of("table").unwrap_or("ironclad-store");
+        tables::list_items(name);
     } else if let Some(x) = app_matches.subcommand_matches("getall") {
         if x.is_present("table") {
             println!(
@@ -436,9 +407,8 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
-        if x.is_present("region") {
-            let reg = tables::get_region(x.value_of("region").unwrap());
-            match reg {
+        let region = tables::get_region(x.value_of("region").unwrap_or("default"));
+            match region {
                 Some(reg) => {
                     let mut delete_table_name = x.value_of("tableName").unwrap();
                     tables::table_deleter(reg, delete_table_name);
@@ -453,9 +423,7 @@ fn main() {
                     }
                 }
             }
-        } else {
             let mut delete_table_name = x.value_of("tableName").unwrap();
             tables::table_deleter(Region::default(), delete_table_name);
-        }
     }
 }
