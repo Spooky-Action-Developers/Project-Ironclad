@@ -89,6 +89,7 @@ pub mod tables {
 
     pub fn get_region(reg: &str) -> Option<Region> {
         match reg {
+            "default" => return Some(Region::default()),
             "ap-northeast-1" => return Some(Region::ApNortheast1),
             "ap-northeast-2" => return Some(Region::ApNortheast2),
             "ap-south-1" => return Some(Region::ApSouth1),
