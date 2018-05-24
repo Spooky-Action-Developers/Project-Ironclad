@@ -72,6 +72,9 @@ Alternatively, most commands take the -r flag to utilize a specific region if de
 7. KMS setup complete
 8. Note: Repeat this process for each region you wish to utilize Project Ironclad in
 
+The system shall utilize the KMS client associated with the default region.
+Then, if the default region is changed through ```AWS_DEFAULT_REGION```, it must have the KMS key setup in that region for Ironclad to work as intended.
+
 ## Usage
 
 ```
