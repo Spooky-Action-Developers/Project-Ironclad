@@ -199,6 +199,8 @@ fn main() {
      * Returns specified information with helpful messages*/
 
     if let Some(x) = app_matches.subcommand_matches("list") {
+        //Sets list subcommand arguments to specified or default values
+        //Attempts to retrieve region from each
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
         match region {
             Some(reg) => {
@@ -211,10 +213,11 @@ fn main() {
                 eprintln!("Must be in list:{}", reg_list_string);
                 for region in regions {
                     println!("{}", region);
-                }
+                } //Region not correctly specified
             }
         }
     } else if let Some(x) = app_matches.subcommand_matches("put") {
+        //Checks if filename is present to put item from file
         if x.is_present("fileName") {
             if x.is_present("secret") {
                 eprintln!("ERROR: Too many arguments for storage.");
@@ -240,6 +243,7 @@ fn main() {
                 );
             }
         } else {
+            //if there exists no filename, assumed input from stdin
             let version = x.value_of("version").unwrap_or("1");
             let table = x.value_of("table").unwrap_or("ironclad-store");
             println!(
@@ -255,6 +259,7 @@ fn main() {
             );
         }
     } else if let Some(x) = app_matches.subcommand_matches("delete") {
+        //Sets delete subcommand arguments to supplied values, or default if none were supplied.
         let table = x.value_of("tableName").unwrap_or("ironclad-store");
         println!(
             "Deleting {}, version number {}...",
@@ -267,6 +272,7 @@ fn main() {
             x.value_of("ID").unwrap(),
         );
     } else if let Some(x) = app_matches.subcommand_matches("setup") {
+        //Sets setup arguments to supplied values, or default if none were supplied.
         let name = x.value_of("name").unwrap_or("ironclad-store");
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
         match region {
@@ -284,13 +290,16 @@ fn main() {
             }
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
+        //View items in supplied table, or default table if arg not supplied
         let name = x.value_of("table").unwrap_or("ironclad-store");
         secrets::list_items(name);
     } else if let Some(x) = app_matches.subcommand_matches("getall") {
+        //Get all secrets from specified table; default table if arg not supplied
         let table = x.value_of("table").unwrap_or("ironclad-store");
         println!("Retrieving secrets from {}...", table);
         secrets::get_all(table);
     } else if let Some(x) = app_matches.subcommand_matches("get") {
+        //Get specified item form supplied table; default table if arg not supplied
         let table = x.value_of("table").unwrap_or("ironclad-store");
         secrets::get_item(
             table,
@@ -298,6 +307,8 @@ fn main() {
             x.value_of("version").unwrap(),
         );
     } else if let Some(x) = app_matches.subcommand_matches("delete-table") {
+        //Set delete table arguments to supplied value, or default if non supplied
+        //Get region from argument
         let region = tables::get_region(x.value_of("region").unwrap_or("default"));
         match region {
             Some(reg) => {
@@ -311,7 +322,7 @@ fn main() {
                 eprintln!("Must be in list:{}", reg_list_string);
                 for region in regions {
                     println!("{}", region);
-                }
+                } //region not correclty specified
             }
         }
     }

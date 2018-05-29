@@ -5,6 +5,14 @@ extern crate rusoto_kms;
 #[macro_use]
 extern crate serde_json;
 
+/*
+ * MACROS
+ * Macros to be utilized by ironclad system
+ * These allow for build patterns of table input
+ * and encryption/decryption contexts
+ *
+ * */
+
 #[macro_export]
 macro_rules! attributes {
         ($($val:expr => $attr_type:expr),*) => {
@@ -50,6 +58,11 @@ macro_rules! val {
         attr
     }};
 }
+
+/*
+ * MODS
+ * The listing of mods used by ironclad system:
+ */
 
 pub mod secrets;
 pub mod tables;
