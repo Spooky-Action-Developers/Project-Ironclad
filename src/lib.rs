@@ -61,7 +61,7 @@ macro_rules! val {
 
 /*
  * MODS
- * The listing of mods used by ironclad system: 
+ * The listing of mods used by ironclad system:
  */
 
 pub mod secrets;
