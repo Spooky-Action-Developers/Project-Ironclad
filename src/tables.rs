@@ -2,53 +2,13 @@ use rusoto_core::region::Region;
 use rusoto_dynamodb::*;
 use rusoto_dynamodb::{CreateTableInput, DynamoDb, DynamoDbClient, ListTablesInput};
 
-#[macro_export]
-macro_rules! attributes {
-        ($($val:expr => $attr_type:expr),*) => {
-            {
-                let mut temp_vec = Vec::new();
-                $(
-                    temp_vec.push(AttributeDefinition { attribute_name: String::from($val),
-                                    attribute_type: String::from($attr_type) });
-                )*
-                temp_vec
-            }
-        }
-    }
-
-#[macro_export]
-macro_rules! key_schema {
-        ($($name:expr => $key_type:expr),*) => {
-            {
-                let mut temp_vec = Vec::new();
-                $(
-                    temp_vec.push(KeySchemaElement { key_type: String::from($key_type),
-                                    attribute_name: String::from($name) });
-                )*
-                temp_vec
-            }
-        }
-    }
-#[macro_export]
-macro_rules! val {
-    (B => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.b = Some($val);
-        attr
-    }};
-    (S => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.s = Some($val.to_string());
-        attr
-    }};
-    (N => $val:expr) => {{
-        let mut attr = AttributeValue::default();
-        attr.n = Some($val.to_string());
-        attr
-    }};
-}
-
 pub fn get_region(reg: &str) -> Option<Region> {
+    /*
+     * Helper function used to parse arguments for region types. This is used to
+     * format arguments of the Region type for, both, the tables and secret mod.
+     *
+     * */
+
     match reg {
         "default" => return Some(Region::default()),
         "ap-northeast-1" => return Some(Region::ApNortheast1),
@@ -74,6 +34,13 @@ pub fn get_region(reg: &str) -> Option<Region> {
 }
 
 pub fn list_tables(region: Region) -> () {
+    /*
+     * Function to list all DynamoDB Tables in a given region.
+     * Utilizes a DynamoDBClient to list all available tables
+     * to stdout.
+     *
+     * */
+
     let client = DynamoDbClient::simple(region);
     let list_tables_input: ListTablesInput = Default::default();
 
@@ -95,6 +62,12 @@ pub fn list_tables(region: Region) -> () {
 }
 
 pub fn table_creator(reg: Region, name: &str) -> () {
+    /*
+     * Function to create a table in a given region. Creates a table with constant read
+     * and write capacity/throughput.
+     *
+     * */
+
     let client = DynamoDbClient::simple(reg);
     let tname = name.to_string();
     let mut table_creator = CreateTableInput::default();
@@ -114,6 +87,12 @@ pub fn table_creator(reg: Region, name: &str) -> () {
 }
 
 pub fn table_deleter(reg: Region, name: &str) -> () {
+    /*
+     * Function to delete a table from a given region. Creates a DynamoDBClient in the region
+     * and uses the table name to create input to delete the table and its contents.
+     *
+     * */
+
     let client = DynamoDbClient::simple(reg);
     let mut table_deleter = DeleteTableInput::default();
     let new_delete_table = name.to_string();

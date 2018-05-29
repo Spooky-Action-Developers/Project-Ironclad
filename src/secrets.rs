@@ -23,6 +23,13 @@ fn encrypt_secret(
     data: &String,
     options: &EncryptOptions,
 ) -> Result<EncryptResponse, EncryptError> {
+    /*
+     * Encrypts a secret. Returns, either, an EncryptResponse or EncryptError
+     * representing whether or not the system was able to encrypt a secret.
+     * This is a helper function called by put_item.
+     *
+     */
+
     let kms_client = KmsClient::simple(Region::default());
     let mut enc_req = EncryptRequest::default();
     enc_req.encryption_context = Some(options.encryption_context.clone());
@@ -34,6 +41,12 @@ fn encrypt_secret(
 }
 
 pub fn put_item(table_name: &str, secret_name: &str, secret: &str, version_number: &str) -> () {
+    /*
+     * Puts a secret/item in the specified table. Does not return any explicit type, but calls
+     * encrypt_secret to encrypt the secret using a KMS client. Then, places it in the DynamDB
+     * table with the specified name and version number associated with it.
+     * */
+
     match version_number.parse::<i32>() {
         Ok(version_num) => {
             let client = DynamoDbClient::simple(Region::default());
@@ -72,6 +85,15 @@ pub fn put_item(table_name: &str, secret_name: &str, secret: &str, version_numbe
 }
 
 pub fn get_item(table_name: &str, secret_name: &str, version_number: &str) -> () {
+    /*
+     * Function to retrieve secret/item data and print it to stdout in JSON format.
+     * Does not return any explicit type. It creates a decryption context utilizing the
+     * associated ironclad aliased KMS key and, upon retrieving the item associated with
+     * the speicifed secret name and version number, decrypts it using this context before
+     * printing to stdout
+     *
+     * */
+
     let client = DynamoDbClient::simple(Region::default());
     let mut get_item_input = GetItemInput::default();
     let mut map = HashMap::new();
@@ -142,6 +164,14 @@ pub fn get_item(table_name: &str, secret_name: &str, version_number: &str) -> ()
 }
 
 pub fn get_all(table_name: &str) -> () {
+    /*
+     * Function to return all secrets from a given table.
+     * Returns no explicit type, but recurrently calls get_item
+     * function for each secret in a table, and prints them to stdout
+     * in JSON format.
+     *
+     * */
+
     let client = DynamoDbClient::simple(Region::default());
     let mut scan_table_input = ScanInput::default();
     scan_table_input.table_name = table_name.to_string();
@@ -167,6 +197,12 @@ pub fn get_all(table_name: &str) -> () {
 }
 
 pub fn delete_item(table_name: &str, secret_name: &str, secret_number: &str) -> () {
+    /*
+     * Function to delete an item from a given table utilizing its name and version number.
+     * Does not return any explicit type.
+     *
+     * */
+
     let client = DynamoDbClient::simple(Region::default());
     let mut delete_item_ = DeleteItemInput::default();
     let mut map_delete = HashMap::new();
@@ -183,6 +219,13 @@ pub fn delete_item(table_name: &str, secret_name: &str, secret_number: &str) -> 
 }
 
 pub fn list_items(table_name: &str) -> () {
+    /*
+     * Function to list all secrets available to retrieved in a given table.
+     * This function does not explicitly return a type, instead printing the
+     * secret name and version number of every secret in a DynamoDB Table.
+     *
+     * */
+
     let client = DynamoDbClient::simple(Region::default());
     let mut scan_table_input = ScanInput::default();
     scan_table_input.table_name = table_name.to_string();
