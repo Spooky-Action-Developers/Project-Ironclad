@@ -6,7 +6,7 @@ extern crate rusoto_dynamodb;
 extern crate rusoto_kms;
 
 use clap::{App, AppSettings, Arg, SubCommand};
-use iron_lib::tables;
+use iron_lib::*;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -232,7 +232,7 @@ fn main() {
                     x.value_of("identifier").unwrap(),
                     version
                 );
-                tables::put_item(
+                secrets::put_item(
                     table,
                     x.value_of("identifier").unwrap(),
                     contents.as_str(),
@@ -247,7 +247,7 @@ fn main() {
                 x.value_of("identifier").unwrap(),
                 version
             );
-            tables::put_item(
+            secrets::put_item(
                 table,
                 x.value_of("identifier").unwrap(),
                 x.value_of("secret").unwrap(),
@@ -261,7 +261,7 @@ fn main() {
             x.value_of("identifier").unwrap(),
             x.value_of("ID").unwrap()
         );
-        tables::delete_item(
+        secrets::delete_item(
             table,
             x.value_of("identifier").unwrap(),
             x.value_of("ID").unwrap(),
@@ -285,14 +285,14 @@ fn main() {
         }
     } else if let Some(x) = app_matches.subcommand_matches("view") {
         let name = x.value_of("table").unwrap_or("ironclad-store");
-        tables::list_items(name);
+        secrets::list_items(name);
     } else if let Some(x) = app_matches.subcommand_matches("getall") {
         let table = x.value_of("table").unwrap_or("ironclad-store");
         println!("Retrieving secrets from {}...", table);
-        tables::get_all(table);
+        secrets::get_all(table);
     } else if let Some(x) = app_matches.subcommand_matches("get") {
         let table = x.value_of("table").unwrap_or("ironclad-store");
-        tables::get_item(
+        secrets::get_item(
             table,
             x.value_of("identifier").unwrap(),
             x.value_of("version").unwrap(),
