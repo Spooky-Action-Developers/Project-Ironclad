@@ -33,7 +33,7 @@ Upon installation of dependencies, the system can be installed and utilized as i
 
 Project Ironclad is a command line utility to effectively create, store and retrieve secrets (or credentials) through Amazon Web Services (AWS). The program utilizes the Rust programming language. In particular, it uses the Rust-Nightly branch of the Rust Language project and is built on top of Rusoto, a AWS SDK that utilizes the AWS API.
 
-##Setup
+## Setup
 
 ### Working With Multiple AWS Accounts (profiles)
 
