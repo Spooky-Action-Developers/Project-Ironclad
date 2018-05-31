@@ -16,7 +16,7 @@ Fork the repo.
 
 Make sure the tests associated with Travis-CI pass upon pull.
 
-Make your change, with new passing tests. Follow the [Pull Request Guide][PULL_REQUEST.md].
+Make your change, with new passing tests. Follow the [Pull Request Guide](PULL_REQUEST.md).
 
 Push to your fork. Write a good commmit message and submit a pull request, refering to the guideline cited above.
 
