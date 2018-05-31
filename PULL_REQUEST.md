@@ -1,3 +1,8 @@
+# Pull Request Template
+
+Please follow this template when creating a PR in order to accurately express the necessary information to gauge whether
+or not this can be added to the project.
+
 * **Please check if the PR fulfills these requirements**
 - [ ] The commit message follows our guidelines
 - [ ] Tests for the changes have been added (for bug fixes / features)
