@@ -12,10 +12,10 @@ though, the current solution is to utilize git and requires Rust-Nightly be inst
 alongside the Rust package manager, Cargo.
 
 ```
-git clone https://github.com/Spooky-Action-Developers/Project-Ironclad.git
-cargo build
-cargo run
+$ git clone https://github.com/Spooky-Action-Developers/Project-Ironclad.git
+$ cargo install --path .
 ```
+
 ### Linux Installation Dependencies
 
 Project Ironclad is reliant upon the rusoto AWS SDK. In order to utilize all features necessary, OpenSSL or equivalent is required.
